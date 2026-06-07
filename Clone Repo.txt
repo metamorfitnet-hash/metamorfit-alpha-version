@@ -1,0 +1,64 @@
+ALPHA_SETUP.md
+
+Markdown
+# Alpha Infrastructure Provisioning Instructions
+
+**CONTEXT:** We are creating a completely isolated parallel environment to create the "Metamorfit Alpha" version of our web app.
+We need to prepare the infrastructure before we clone the repository from the currently running "Beta" version on Github.
+Follow these instructions step-by-step to provision the infrastructure via the Wrangler CLI.
+
+## STEP 1: Authenticate Cloudflare
+Ensure you are logged into the correct free-tier Cloudflare account before running any provisioning commands.
+```bash
+npx wrangler login
+
+STEP 2: Provision KV Namespaces
+Run these commands to create the three required Alpha KV namespaces.
+CRITICAL: Capture the output id of each command; we will need them for the configuration files.
+
+Bash
+# Create the Ledger KV
+npx wrangler kv:namespace create MM_LEDGER_ALPHA
+
+# Create the Job Status KV
+npx wrangler kv:namespace create JOB_STATUS_ALPHA
+
+# Create the Meal Cache KV
+npx wrangler kv:namespace create MEAL_CACHE_ALPHA
+
+STEP 3: Provision R2 Storage Bucket
+Run this command to create the isolated Alpha PDF storage bucket.
+
+Bash
+npx wrangler r2 bucket create metamorfit-pdf-alpha
+
+STEP 4: Provision D1 Relational Database
+Run this command to create the Alpha relational database.
+
+Bash
+npx wrangler d1 create METAMORFIT_DB_ALPHA
+
+STEP 5: Update Configuration Files (wrangler.jsonc / wrangler.toml)
+Once the resources above are created, locate the configuration files in packages/worker/ and packages/macro-engine/ and update their bindings to point to the new Alpha assets.
+
+⚠️ STRICT FREE-TIER COMPLIANCE GUARDRAILS
+When updating the configuration files, you MUST ensure the following paid features remain completely absent to prevent deployment failure:
+
+❌ NO placement: { mode: "smart" }
+
+❌ NO observability: { enabled: true }
+
+Required Bindings Update Schema:
+KV Bindings: Update MM_LEDGER, JOB_STATUS, and MEAL_CACHE variables to map to the newly generated Alpha IDs.
+
+R2 Binding: Point PDF_STORAGE to metamorfit-pdf-alpha.
+
+D1 Binding: Point METAMORFIT_DB to the new METAMORFIT_DB_ALPHA database ID.
+
+STEP 6: Verify Local Isolation
+Run the local environment with persistence enabled to ensure local development will not touch production data.
+
+Bash
+npx wrangler dev --local --persist
+
+---
