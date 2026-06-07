@@ -1,0 +1,33 @@
+{
+  "name": "metamorfit-beta",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:all": "concurrently \"npm run dev --workspace=apps/web\" \"npm run dev --workspace=packages/worker\" \"npm run dev --workspace=packages/macro-engine -- --port 8788\"",
+    "dev": "npm run dev --workspaces",
+    "build": "npm run build --workspace=apps/web",
+    "beta:health": "echo 'Visit https://metamorfit-worker-beta.metamorfitnet.workers.dev/api/debug/health'",
+    "beta:pdf-test": "./scripts/test-pdf-pipeline.sh",
+    "beta:apply-schema": "./scripts/d1-apply-schema.sh",
+    "beta:list-plans": "./scripts/d1-list-user-plans.sh"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.8.0",
+    "@opentelemetry/api": "^1.9.1",
+    "@react-email/components": "^1.0.12",
+    "@react-email/render": "^2.0.6",
+    "caniuse-lite": "^1.0.30001792",
+    "hono": "^4.0.0",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "tsx": "^4.7.1",
+    "typescript": "^5.3.3"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "turbo": "^2.9.12"
+  }
+}

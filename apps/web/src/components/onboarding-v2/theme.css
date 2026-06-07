@@ -1,0 +1,58 @@
+/* Onboarding V2 CSS Variables */
+.onboarding-v2-scope {
+  --bg-primary: #121212;
+  --bg-card: #1c1c1c;
+  --bg-card-hover: #242424;
+  --bg-card-selected: #2a2410;
+  
+  --gold-primary: #D4AF37;
+  --gold-secondary: #c9a84c;
+  --gold-text: #D4AF37;
+  
+  --text-primary: #FFFFFF;
+  --text-muted: #888888;
+  --text-dim: #555555;
+  
+  --border-default: #2e2e2e;
+  --border-selected: #D4AF37;
+  
+  --border-radius-card: 12px;
+  --border-radius-input: 8px;
+
+  --transition-fast: 150ms ease;
+  --transition-card: 200ms ease;
+  --auto-advance-delay: 400ms;
+  --step-transition: 300ms ease-in-out;
+}
+
+/* Ensure font families are applied based on the spec */
+.onboarding-v2-scope {
+  font-family: var(--font-sans), 'DM Sans', sans-serif;
+  color: var(--text-primary);
+  background-color: var(--bg-primary);
+}
+
+.onboarding-v2-scope .font-bebas {
+  font-family: var(--font-bebas), 'Bebas Neue', sans-serif;
+}
+
+@keyframes shimmer-gold-v2 {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.animate-shimmer-v2 {
+  position: relative;
+  overflow: hidden;
+}
+
+.animate-shimmer-v2::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(212,175,55,0.4), transparent);
+  animation: shimmer-gold-v2 1.2s infinite;
+}

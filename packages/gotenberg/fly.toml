@@ -1,0 +1,15 @@
+app = "metamorfit-v2"
+primary_region = "ewr"
+
+[http_service]
+  internal_port = 3000
+  force_https = true
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 1
+  processes = ["app"]
+
+[env]
+  API_ENABLE_BASIC_AUTH = "true"
+  GOTENBERG_API_BASIC_AUTH_USERNAME = "worker"
+  GOTENBERG_API_BASIC_AUTH_PASSWORD = "beta_render_token_491"

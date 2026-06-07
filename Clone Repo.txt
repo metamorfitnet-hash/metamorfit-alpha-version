@@ -3,9 +3,8 @@ ALPHA_SETUP.md
 Markdown
 # Alpha Infrastructure Provisioning Instructions
 
-**CONTEXT:** We are creating a completely isolated parallel environment to create the "Metamorfit Alpha" version of our web app.
-We need to prepare the infrastructure before we clone the repository from the currently running "Beta" version on Github.
-Follow these instructions step-by-step to provision the infrastructure via the Wrangler CLI.
+**CONTEXT:** We are creating a completely isolated parallel environment for "Metamorfit Alpha". 
+Follow these istep by step to provision the infrastructure usingnstructions step-by-step to provision the infrastructure via the Wrangler CLI.
 
 ## STEP 1: Authenticate Cloudflare
 Ensure you are logged into the correct free-tier Cloudflare account before running any provisioning commands.

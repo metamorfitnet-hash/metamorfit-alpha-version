@@ -1,0 +1,209 @@
+import React, { useState, useEffect } from 'react';
+import { OnboardingState } from '../types';
+import { useTranslation } from 'react-i18next';
+
+interface Props {
+  state: OnboardingState;
+  updateState: (updates: Partial<OnboardingState>) => void;
+}
+
+export default function Step1PersonaSelect({ state, updateState }: Props) {
+  const { t } = useTranslation();
+  const [error, setError] = useState<string | null>(null);
+  const [animateIn, setAnimateIn] = useState(false);
+
+  const PERSONAS = [
+    {
+      id: 'hardgainer',
+      label: t('step1.personas.hardgainer.label'),
+      desc: t('step1.personas.hardgainer.desc'),
+      icon: (
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12 4v16m-4-4h8M8 8h8" />
+        </svg>
+      )
+    },
+    {
+      id: 'rebuilder',
+      label: t('step1.personas.rebuilder.label'),
+      desc: t('step1.personas.rebuilder.desc'),
+      icon: (
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+          <path d="M3 3v5h5" />
+        </svg>
+      )
+    },
+    {
+      id: 'optimizer',
+      label: t('step1.personas.optimizer.label'),
+      desc: t('step1.personas.optimizer.desc'),
+      icon: (
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M3 3v18h18" />
+          <path d="M18 9l-5 5-4-4-5 5" />
+        </svg>
+      )
+    },
+    {
+      id: 'converter',
+      label: t('step1.personas.converter.label'),
+      desc: t('step1.personas.converter.desc'),
+      icon: (
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+        </svg>
+      )
+    }
+  ];
+
+  useEffect(() => {
+    // Trigger animation on mount
+    const timer = setTimeout(() => setAnimateIn(true), 50);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handlePersonaClick = (personaId: OnboardingState['persona']) => {
+    // 1. Check validation
+    if (!state.sex) {
+      setError(t('step1.errorSex'));
+      return;
+    }
+    
+    if (!state.age || state.age < 13 || state.age > 80) {
+      setError(t('step1.errorAge'));
+      return;
+    }
+
+    // Clear error
+    setError(null);
+    
+    // 2. Update state
+    updateState({ persona: personaId });
+
+    // Auto-advance
+    setTimeout(() => {
+      updateState({ currentStep: 2 });
+    }, 400);
+  };
+
+  const isFormValid = 
+    state.sex !== null && 
+    state.age !== null && 
+    state.age >= 13 && 
+    state.age <= 80 && 
+    state.persona !== null;
+
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Enter' && isFormValid) {
+        e.preventDefault();
+        updateState({ currentStep: 2 });
+      }
+    };
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, [isFormValid, updateState]);
+
+  return (
+    <div 
+      className={`w-full transition-all duration-[300ms] ease-in-out ${
+        animateIn ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
+      }`}
+    >
+      <div className="mb-8">
+        <h2 className="font-bebas text-[18px] md:text-xl mb-4 tracking-wide text-white uppercase">{t('step1.title')}</h2>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="flex flex-col">
+            <label htmlFor="sex-select" className="font-sans font-semibold text-[13px] text-[#888888] uppercase tracking-[0.1em] mb-2">{t('step1.sexLabel')}</label>
+            <div className="relative">
+              <select 
+                id="sex-select"
+                value={state.sex || ''} 
+                onChange={(e) => updateState({ sex: e.target.value as 'male' | 'female' })}
+                className="w-full appearance-none bg-[var(--bg-card)] border border-[var(--border-default)] focus:border-[var(--border-selected)] text-white rounded-[var(--border-radius-input)] px-4 py-3 outline-none font-sans transition-colors cursor-pointer"
+              >
+                <option value="" disabled>{t('step1.sexSelect')}</option>
+                <option value="male">{t('step1.sexMale')}</option>
+                <option value="female">{t('step1.sexFemale')}</option>
+              </select>
+              <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-[var(--gold-primary)]">
+                <svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-col">
+            <label htmlFor="age-input" className="font-sans font-semibold text-[13px] text-[#888888] uppercase tracking-[0.1em] mb-2">{t('step1.ageLabel')}</label>
+            <input 
+              id="age-input"
+              type="number" 
+              placeholder="--"
+              value={state.age || ''}
+              onChange={(e) => updateState({ age: e.target.value ? parseInt(e.target.value, 10) : null })}
+              className="w-full bg-[var(--bg-card)] border border-[var(--border-default)] focus:border-[var(--border-selected)] text-white rounded-[var(--border-radius-input)] px-4 py-3 outline-none font-sans transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            />
+          </div>
+        </div>
+        {error && (
+          <p className="text-[#e05252] font-sans text-[12px] mt-2">{error}</p>
+        )}
+      </div>
+
+      <div className="w-full h-[1px] bg-[#2e2e2e] mb-8"></div>
+
+      <div className="mb-6">
+        <h2 className="font-bebas text-2xl tracking-wide text-white mb-1">{t('step1.whoAreYou')}</h2>
+        <p className="font-sans text-[15px] text-[#888888]">{t('step1.whoAreYouDesc')}</p>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+        {PERSONAS.map((p) => {
+          const isSelected = state.persona === p.id;
+          return (
+            <button
+              key={p.id}
+              onClick={() => handlePersonaClick(p.id as OnboardingState['persona'])}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handlePersonaClick(p.id as OnboardingState['persona']);
+                }
+              }}
+              className={`
+                flex flex-col items-start p-5 rounded-[var(--border-radius-card)] text-left transition-all duration-[200ms] ease-in-out outline-none focus-visible:ring-2 focus-visible:ring-[var(--gold-primary)]
+                ${isSelected 
+                  ? 'bg-[var(--bg-card-selected)] border-2 border-[var(--gold-primary)] shadow-[0_0_12px_rgba(212,175,55,0.25)]' 
+                  : 'bg-[var(--bg-card)] border border-[var(--border-default)] hover:bg-[var(--bg-card-hover)] hover:border-[var(--gold-secondary)]'
+                }
+              `}
+              role="button"
+              tabIndex={0}
+            >
+              <div className={`mb-3 ${isSelected ? 'text-[var(--gold-primary)]' : 'text-[#888888]'}`}>
+                {p.icon}
+              </div>
+              <h3 className="font-bebas text-xl text-white tracking-wide uppercase mb-1">{p.label}</h3>
+              <p className="font-sans text-[13px] text-[#888888] leading-snug">{p.desc}</p>
+            </button>
+          );
+        })}
+      </div>
+
+      <button
+        disabled={!isFormValid}
+        onClick={() => updateState({ currentStep: 2 })}
+        className={`
+          w-full py-4 rounded-[var(--border-radius-input)] font-sans font-bold uppercase tracking-[0.15em] text-[15px] transition-all duration-200
+          ${isFormValid 
+            ? 'bg-[var(--gold-primary)] text-[#121212] hover:bg-[var(--gold-secondary)] hover:-translate-y-[1px] shadow-[0_4px_12px_rgba(212,175,55,0.2)]' 
+            : 'bg-[var(--bg-card)] text-[var(--text-dim)] pointer-events-none'
+          }
+        `}
+      >
+        {t('step1.continueBtn')}
+      </button>
+    </div>
+  );
+}

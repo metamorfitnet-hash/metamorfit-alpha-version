@@ -1,0 +1,152 @@
+{
+  "header": {
+    "badge": "PRECISION METABOLIC ENGINE V2.0",
+    "title1": "OPTIMIZE YOUR",
+    "title2": "METABOLIC ENGINE.",
+    "subtitle": "Calculate your exact metabolic needs with premium scientific precision and elite-grade diagnostic tools."
+  },
+  "step1": {
+    "title": "YOUR INFORMATION",
+    "sexLabel": "SEX",
+    "sexSelect": "Select",
+    "sexMale": "Male",
+    "sexFemale": "Female",
+    "ageLabel": "AGE (YRS)",
+    "errorSex": "Please select your sex.",
+    "errorAge": "Please enter a valid age (13-80).",
+    "whoAreYou": "WHO ARE YOU?",
+    "whoAreYouDesc": "Select the profile that best matches you.",
+    "continueBtn": "CONTINUE →",
+    "personas": {
+      "hardgainer": {
+        "label": "The Hardgainer",
+        "desc": "Struggling to add mass despite consistent effort"
+      },
+      "rebuilder": {
+        "label": "The Rebuilder",
+        "desc": "Returning after a break or injury"
+      },
+      "optimizer": {
+        "label": "The Optimizer",
+        "desc": "Already training — want precision gains"
+      },
+      "converter": {
+        "label": "The Converter",
+        "desc": "Shifting from excess fat to lean muscle"
+      }
+    }
+  },
+  "step2": {
+    "title": "SELECT YOUR OBJECTIVE",
+    "desc": "Your training protocol adapts to this.",
+    "continueBtn": "CONTINUE →",
+    "selectObjectiveFallback": "Select an objective above to view the scientific protocol.",
+    "goals": {
+      "maintain": {
+        "label": "MAINTAIN",
+        "desc": "Calibrate intake to match TDEE precisely — preserving lean mass, hormonal equilibrium, and metabolic stability."
+      },
+      "bulk": {
+        "label": "BULK",
+        "desc": "Activate mTOR signaling and optimize protein synthesis windows. A structured surplus triggers satellite cell recruitment and anabolic hormone response."
+      },
+      "cut": {
+        "label": "CUT",
+        "desc": "Preserve muscle via strategic deficit engineering. Prioritize protein intake to prevent catabolism while managing cortisol and thyroid output."
+      },
+      "recomp": {
+        "label": "RECOMP",
+        "desc": "Simultaneously reduce fat and build lean tissue through nutrient partitioning, insulin sensitivity optimization, and precision timing."
+      }
+    }
+  },
+  "step3": {
+    "title": "YOUR PHYSICAL BASELINE",
+    "desc": "Precision calibration requires exact data.",
+    "weightLabel": "WEIGHT",
+    "heightLabel": "HEIGHT",
+    "continueBtn": "CONTINUE →"
+  },
+  "step4": {
+    "title": "CHOOSE YOUR BODY TYPE",
+    "desc": "Your personalized plan starts here.",
+    "continueBtn": "CONTINUE →",
+    "somatotypes": {
+      "ectomorph": {
+        "label": "ECTOMORPH",
+        "desc": "Naturally lean with a faster metabolism. Built for endurance and agility. High NEAT, fast gastric emptying — requires strategic surplus."
+      },
+      "mesomorph": {
+        "label": "MESOMORPH",
+        "desc": "Naturally athletic with efficient muscle growth. Built for power and speed. Responds well to moderate training volume."
+      },
+      "endomorph": {
+        "label": "ENDOMORPH",
+        "desc": "Stronger build with a slower metabolism. Built for stability and raw strength. Prioritizes nutrient partitioning and insulin management."
+      }
+    }
+  },
+  "step5": {
+    "title": "ACTIVITY PROFILE",
+    "desc": "Your TDEE scales with your weekly output.",
+    "placeholder": "Select activity level",
+    "continueBtn": "CONTINUE →",
+    "levels": {
+      "sedentary": {
+        "label": "Sedentary — Little or no exercise",
+        "desc": "Baseline metabolic rate calculation. Suitable if you work a desk job and do not engage in structured physical activity."
+      },
+      "light": {
+        "label": "Light — 1–3 days / week",
+        "desc": "Light physical activity or sports performed 1 to 3 days per week. Generates a mild increase in caloric baseline."
+      },
+      "moderate": {
+        "label": "Moderate — 3–5 days / week",
+        "desc": "Moderate intensity training 3 to 5 days per week. Requires sustained fuel for recovery and muscle glycogen replenishment."
+      },
+      "active": {
+        "label": "Active — 6–7 days / week",
+        "desc": "High frequency and intensity training almost daily. Requires robust caloric support to prevent catabolism."
+      },
+      "very_active": {
+        "label": "Very Active — Physical job + training",
+        "desc": "Intense daily training combined with a physically demanding occupation. Generates maximum metabolic burn."
+      }
+    }
+  },
+  "step6": {
+    "title": "PRECISION TUNING",
+    "desc": "Optional data improves calibration.",
+    "bodyFatLabel": "BODY FAT %",
+    "bodyFatSublabel": "ENABLE PRECISION MODE",
+    "bodyFatHint": "Enable precision mode if you know your body fat %.",
+    "somatotypeTweakLabel": "SOMATOTYPE TWEAK",
+    "somatotypeTweakSublabel": "METABOLIC BASELINE ADJUST",
+    "calibrateBtn": "CALIBRATE METABOLIC ENGINE →",
+    "calibratingBtn": "CALIBRATING..."
+  },
+  "dashboard": {
+    "resultsTitle": "Your Results",
+    "dailyTarget": "Daily Target",
+    "tdeeBaseline": "TDEE Baseline",
+    "tdeeSubtitle": "Optimized for your transformation objective.",
+    "basalMetabolicRate": "Basal Metabolic Rate",
+    "macroBreakdown": "Macro Breakdown & Logic",
+    "protein": "Protein",
+    "proteinDesc": "Building block for muscle retention.",
+    "carbohydrates": "Carbohydrates",
+    "carbsDesc": "Strategic energy for {{goal}} phase.",
+    "fats": "Fats",
+    "fatsDesc": "Optimized fuel for {{bodyType}} metabolism.",
+    "personalizationScore": "Personalization Score",
+    "accuracyLabel": "Accuracy level of your engine sync",
+    "fiberGrams": "Fiber Grams",
+    "waterLiters": "Water Liters",
+    "stepTarget": "Step Target",
+    "buildMealPlan": "Build My Meal Plan",
+    "metabolicInsightTitle": "Metabolic Insight",
+    "metabolicInsightSubtitle": "Precision Logic • Macro Engine Analysis",
+    "liveAnalysis": "Live Analysis",
+    "awaitingSync": "Awaiting metabolic synchronization. Run a calculation to generate your personalized AI coaching insight."
+  }
+}

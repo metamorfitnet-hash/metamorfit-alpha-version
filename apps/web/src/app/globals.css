@@ -1,0 +1,168 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-bebas: var(--font-bebas);
+  --font-sans: var(--font-dm-sans);
+  --font-heading: var(--font-bebas);
+  --font-body: var(--font-dm-sans);
+  --color-mm-black: #0a0a08;
+  --color-mm-dark: #1a1a17;
+  --color-mm-offblack: #111110;
+  --color-mm-gold: #c9a84c;
+  --color-mm-bone: #e8e2d5;
+  --color-mm-steel: #78716c;
+
+  /* Landing page specific colors */
+  --color-lp-header-bg: #1a1a17;
+  --color-lp-body-bg: #0f0f0d;
+  --color-lp-surface: #171714;
+  --color-lp-surface-2: #1c1c19;
+  --color-lp-gold: #d4af37;
+  --color-lp-gold-mid: #a8892a;
+  --color-lp-gold-faint: rgba(212, 175, 55, 0.08);
+  --color-lp-gold-glow: rgba(212, 175, 55, 0.20);
+  --color-lp-cream: #ece6d8;
+  --color-lp-cream-dim: #ccc6b8;
+  --color-lp-muted: #a09890;
+  --color-lp-line: rgba(212, 175, 55, 0.12);
+
+  @keyframes fadeUp_lp {
+    from { opacity: 0; transform: translateY(22px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn_lp {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes pulseGlow_lp {
+    0%, 100% { box-shadow: 0 0 32px rgba(212, 175, 55, 0.18); }
+    50% { box-shadow: 0 0 52px rgba(212, 175, 55, 0.34); }
+  }
+
+  --animate-lp-fade-up: fadeUp_lp 0.65s 0.05s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-lp-fade-in: fadeIn_lp 0.4s ease both;
+  --animate-lp-pulse-glow: pulseGlow_lp 3.5s ease-in-out infinite;
+
+  --ease-lp-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-lp-std: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+@layer base {
+  h1 { 
+    @apply font-heading uppercase tracking-tighter text-[48px] md:text-[64px] leading-[0.85] text-mm-bone; 
+  }
+  h2 { 
+    @apply font-heading uppercase tracking-tight text-[32px] md:text-[40px] leading-[1.1] text-mm-gold; 
+  }
+  h3 { 
+    @apply font-heading uppercase tracking-wide text-[24px] md:text-[28px] leading-tight text-mm-bone; 
+  }
+  h4 { 
+    @apply font-heading uppercase tracking-widest text-[20px] md:text-[22px] leading-snug text-mm-gold/90; 
+  }
+  p { 
+    @apply font-body text-[16px] md:text-[18px] leading-[1.7] text-mm-bone/80; 
+  }
+  label { 
+    @apply font-body text-[15px] font-medium text-mm-bone/60 uppercase tracking-[0.15em]; 
+  }
+}
+
+body {
+  background-color: #050505;
+  background-image: 
+    linear-gradient(135deg, rgba(10, 10, 8, 0.4) 0%, transparent 50%, rgba(10, 10, 8, 0.4) 100%),
+    radial-gradient(circle at 50% 40%, rgba(201, 168, 76, 0.08), transparent 40%),
+    radial-gradient(circle at 50% 100%, rgba(201, 168, 76, 0.05), transparent 60%),
+    linear-gradient(to bottom, #050505 0%, #0a0a08 100%);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
+  color: #e8e2d5;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Original App Animations */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes modalIn { from { opacity: 0; transform: scale(0.95) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+@keyframes streak { 0% { transform: translateX(-100%); opacity: 0; } 20% { opacity: 0.3; } 80% { opacity: 0.3; } 100% { transform: translateX(100%); opacity: 0; } }
+@keyframes soft-pulse { 0%, 100% { opacity: 0.4; transform: scale(1); } 50% { opacity: 0.7; transform: scale(1.05); } }
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes pulse-subtle { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+
+.animate-streak { animation: streak 6s cubic-bezier(0.16, 1, 0.3, 1) infinite; }
+.animate-modalIn { animation: modalIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.animate-fadeIn { animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.animate-slideUp { animation: slideUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.animate-soft-pulse { animation: soft-pulse 4s ease-in-out infinite; }
+.animate-fadeInUp { animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.animate-pulse-subtle { animation: pulse-subtle 2s ease-in-out infinite; }
+
+.text-glow-gold { text-shadow: 0 0 20px rgba(201, 168, 76, 0.4); }
+.bg-glow-gold { box-shadow: 0 0 40px rgba(201, 168, 76, 0.15); }
+.nav-header-blend { background-color: #1a1a17 !important; border-bottom: 1px solid rgba(255, 255, 255, 0.03); box-shadow: none !important; }
+
+/* Isolated Landing Page Styles */
+.landing-page-wrapper {
+  @apply bg-lp-body-bg text-lp-cream font-sans font-light leading-relaxed min-h-[100svh] flex flex-col overflow-x-hidden;
+  /* grain overlay */
+  &::before {
+    content: '';
+    @apply fixed inset-0 pointer-events-none z-[1000];
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.88' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.028'/%3E%3C/svg%3E");
+  }
+
+  .lp-btn-primary {
+    @apply inline-block font-sans text-[0.75rem] font-medium tracking-[0.22em] uppercase text-[#0c0c0a] bg-lp-gold px-[2.4rem] py-[0.9rem] rounded-[4px] no-underline relative overflow-hidden animate-lp-pulse-glow transition-all duration-300 hover:bg-[#e2be4a] hover:-translate-y-[2px] hover:shadow-[0_0_60px_rgba(212,175,55,0.42)] hover:animate-none;
+  }
+  .lp-btn-primary::after {
+    content: '';
+    @apply absolute inset-0 transition-transform duration-[550ms] ease-lp-out -translate-x-[110%];
+    background: linear-gradient(105deg, transparent 30%, rgba(255, 255, 255, 0.22) 50%, transparent 70%);
+  }
+  .lp-btn-primary:hover::after { @apply translate-x-[110%]; }
+
+  .lp-btn-continue {
+    @apply block w-full font-sans text-[0.78rem] font-medium tracking-[0.2em] uppercase text-center no-underline text-[#0c0c0a] bg-lp-gold px-[2rem] py-[1rem] rounded-[4px] relative overflow-hidden transition-all duration-300 shadow-[0_0_28px_rgba(212,175,55,0.18)] hover:bg-[#e2be4a] hover:-translate-y-[2px] hover:shadow-[0_0_52px_rgba(212,175,55,0.38)];
+  }
+  .lp-btn-continue::after {
+    content: '';
+    @apply absolute inset-0 transition-transform duration-[500ms] ease-lp-out -translate-x-[110%];
+    background: linear-gradient(105deg, transparent 30%, rgba(255, 255, 255, 0.2) 50%, transparent 70%);
+  }
+  .lp-btn-continue:hover::after { @apply translate-x-[110%]; }
+
+  .lp-step-card {
+    @apply grid grid-cols-[44px_1fr] gap-[1rem] items-center px-[1.1rem] md:px-[1.5rem] py-[0.9rem] bg-lp-surface border border-lp-line rounded-[5px] relative overflow-hidden cursor-default opacity-0 animate-lp-fade-up transition-all duration-300 hover:border-lp-gold/32 hover:bg-lp-surface-2 hover:-translate-y-[1px] hover:scale-[1.005] hover:shadow-[0_6px_32px_rgba(0,0,0,0.45),0_0_0_1px_rgba(212,175,55,0.08)];
+  }
+  .lp-step-card .step-num { @apply font-bebas text-[1.65rem] text-lp-gold/75 leading-none text-center transition-opacity duration-300; }
+  .lp-step-card .step-title { @apply font-sans text-[0.86rem] font-medium tracking-[0.03em] text-lp-cream leading-[1.2] mb-[0.2rem] transition-colors duration-200; }
+  .lp-step-card .step-desc { @apply text-[0.73rem] text-lp-muted leading-[1.5] transition-colors duration-200; }
+  
+  .lp-step-card:hover .step-num { @apply opacity-100; }
+  .lp-step-card:hover .step-title { @apply text-white; }
+  .lp-step-card:hover .step-desc { @apply text-lp-cream-dim; }
+
+  .lp-step-card::before {
+    content: '';
+    @apply absolute left-0 top-0 bottom-0 w-[2px] bg-lp-gold scale-y-0 origin-bottom transition-transform duration-300;
+  }
+  .lp-step-card:hover::before { @apply scale-y-100; }
+  .lp-step-card::after {
+    content: '';
+    @apply absolute inset-0 -translate-x-[110%] transition-transform duration-500 ease-lp-out;
+    background: linear-gradient(105deg, transparent 30%, rgba(212, 175, 55, 0.05) 50%, transparent 70%);
+  }
+  .lp-step-card:hover::after { @apply translate-x-[110%]; }
+}
+
+.score-circle-animated { transition: stroke-dashoffset 1.5s ease-out; }

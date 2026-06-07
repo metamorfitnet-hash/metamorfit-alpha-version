@@ -1,0 +1,29 @@
+name = "metamorfit-main-engine-alpha"
+main = "src/index.ts"
+compatibility_date = "2026-04-09"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+# Add any necessary env vars here
+
+[ai]
+binding = "AI"
+
+[[kv_namespaces]]
+binding = "MEAL_CACHE"
+id = "228ffea7ae6c44bda3e7be1af695242b"
+
+[[kv_namespaces]]
+binding = "JOB_STATUS"
+id = "0350a1c480574f7ab2afa4917f71b0eb"
+
+[[d1_databases]]
+binding = "METAMORFIT_DB"
+database_name = "METAMORFIT_DB_ALPHA"
+database_id = "508d5eaf-8198-4467-ba02-fa49646e6891"
+
+[[r2_buckets]]
+binding = "PDF_STORAGE"
+bucket_name = "metamorfit-pdf-alpha"
+
+

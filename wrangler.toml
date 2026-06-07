@@ -1,0 +1,51 @@
+name = "metamorfit-worker-alpha"
+main = "packages/worker/src/index.ts"
+compatibility_date = "2026-04-09"
+compatibility_flags = ["nodejs_compat"]
+upload_source_maps = true
+
+[vars]
+GOTENBERG_URL = "https://gotenberg-alpha-15308390055.us-central1.run.app"
+# SENTRY_DSN is stored as a Wrangler secret (not plaintext here).
+# Run: npx wrangler secret put SENTRY_DSN
+
+# [placement]
+# mode = "smart"  # REMOVED — paid-tier feature, breaks free-tier deployments
+
+[ai]
+binding = "AI"
+
+[[kv_namespaces]]
+binding = "MEAL_CACHE"
+id = "228ffea7ae6c44bda3e7be1af695242b"
+
+[[kv_namespaces]]
+binding = "JOB_STATUS"
+id = "0350a1c480574f7ab2afa4917f71b0eb"
+
+[[kv_namespaces]]
+binding = "MM_LEDGER"
+id = "7bbe228762b94ab88a19b60b55942502"
+
+[[d1_databases]]
+binding = "METAMORFIT_DB"
+database_name = "METAMORFIT_DB_ALPHA"
+database_id = "508d5eaf-8198-4467-ba02-fa49646e6891"
+
+[[r2_buckets]]
+binding = "PDF_STORAGE"
+bucket_name = "metamorfit-pdf-alpha"
+# preview_bucket_name = "metamorfit-pdf-beta-dev" # Uncomment for wrangler dev local testing
+
+# [observability]
+# enabled = true  # REMOVED — paid-tier feature, breaks free-tier deployments
+
+# Removed WASM and Font rules — no longer needed with Gotenberg architecture
+
+
+[[services]]
+binding = "MACRO_ENGINE"
+service = "metamorfit-main-engine-alpha"
+
+[dev]
+port = 8787

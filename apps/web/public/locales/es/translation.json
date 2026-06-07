@@ -1,0 +1,152 @@
+{
+  "header": {
+    "badge": "MOTOR METABÓLICO DE PRECISIÓN V2.0",
+    "title1": "OPTIMIZA TU",
+    "title2": "MOTOR METABÓLICO.",
+    "subtitle": "Calcula tus necesidades metabólicas exactas con precisión científica premium y herramientas de diagnóstico de élite."
+  },
+  "step1": {
+    "title": "TU INFORMACIÓN",
+    "sexLabel": "SEXO",
+    "sexSelect": "Seleccionar",
+    "sexMale": "Masculino",
+    "sexFemale": "Femenino",
+    "ageLabel": "EDAD (AÑOS)",
+    "errorSex": "Por favor, selecciona tu sexo.",
+    "errorAge": "Por favor, introduce una edad válida (13-80).",
+    "whoAreYou": "¿QUIÉN ERES?",
+    "whoAreYouDesc": "Selecciona el perfil que mejor te describa.",
+    "continueBtn": "CONTINUAR →",
+    "personas": {
+      "hardgainer": {
+        "label": "El Hardgainer",
+        "desc": "Te cuesta ganar masa muscular a pesar del esfuerzo constante"
+      },
+      "rebuilder": {
+        "label": "El Reconstructor",
+        "desc": "Volviendo después de un descanso o lesión"
+      },
+      "optimizer": {
+        "label": "El Optimizador",
+        "desc": "Ya entrenas — quieres ganancias precisas"
+      },
+      "converter": {
+        "label": "El Convertidor",
+        "desc": "Cambiando exceso de grasa a músculo magro"
+      }
+    }
+  },
+  "step2": {
+    "title": "SELECCIONA TU OBJETIVO",
+    "desc": "Tu protocolo de entrenamiento se adaptará a esto.",
+    "continueBtn": "CONTINUAR →",
+    "selectObjectiveFallback": "Selecciona un objetivo arriba para ver el protocolo científico.",
+    "goals": {
+      "maintain": {
+        "label": "MANTENER",
+        "desc": "Calibra la ingesta para que coincida exactamente con tu TDEE — preservando la masa magra, el equilibrio hormonal y la estabilidad metabólica."
+      },
+      "bulk": {
+        "label": "VOLUMEN",
+        "desc": "Activa la señalización mTOR y optimiza las ventanas de síntesis de proteínas. Un superávit estructurado desencadena el reclutamiento de células satélite y la respuesta hormonal anabólica."
+      },
+      "cut": {
+        "label": "DEFINICIÓN",
+        "desc": "Preserva el músculo mediante una ingeniería de déficit estratégico. Prioriza la ingesta de proteínas para prevenir el catabolismo mientras controlas la producción de cortisol y tiroides."
+      },
+      "recomp": {
+        "label": "RECOMPOSICIÓN",
+        "desc": "Reduce la grasa y desarrolla tejido magro simultáneamente mediante la partición de nutrientes, la optimización de la sensibilidad a la insulina y la sincronización precisa."
+      }
+    }
+  },
+  "step3": {
+    "title": "TU LÍNEA BASE FÍSICA",
+    "desc": "La calibración de precisión requiere datos exactos.",
+    "weightLabel": "PESO",
+    "heightLabel": "ALTURA",
+    "continueBtn": "CONTINUAR →"
+  },
+  "step4": {
+    "title": "ELIGE TU TIPO DE CUERPO",
+    "desc": "Tu plan personalizado comienza aquí.",
+    "continueBtn": "CONTINUAR →",
+    "somatotypes": {
+      "ectomorph": {
+        "label": "ECTOMORFO",
+        "desc": "Naturalmente delgado con un metabolismo más rápido. Construido para la resistencia y la agilidad. NEAT alto, vaciado gástrico rápido — requiere un superávit estratégico."
+      },
+      "mesomorph": {
+        "label": "MESOMORFO",
+        "desc": "Naturalmente atlético con un crecimiento muscular eficiente. Construido para la potencia y la velocidad. Responde bien a un volumen de entrenamiento moderado."
+      },
+      "endomorph": {
+        "label": "ENDOMORFO",
+        "desc": "Complexión más robusta con un metabolismo más lento. Construido para la estabilidad y la fuerza bruta. Prioriza la partición de nutrientes y el control de la insulina."
+      }
+    }
+  },
+  "step5": {
+    "title": "PERFIL DE ACTIVIDAD",
+    "desc": "Tu TDEE escala con tu rendimiento semanal.",
+    "placeholder": "Selecciona nivel de actividad",
+    "continueBtn": "CONTINUAR →",
+    "levels": {
+      "sedentary": {
+        "label": "Sedentario — Poco o ningún ejercicio",
+        "desc": "Cálculo de la tasa metabólica basal. Adecuado si trabajas en un escritorio y no realizas actividad física estructurada."
+      },
+      "light": {
+        "label": "Ligero — 1–3 días / semana",
+        "desc": "Actividad física ligera o deportes realizados de 1 a 3 días por semana. Genera un leve aumento en la base calórica."
+      },
+      "moderate": {
+        "label": "Moderado — 3–5 días / semana",
+        "desc": "Entrenamiento de intensidad moderada de 3 a 5 días por semana. Requiere combustible sostenido para la recuperación y la reposición del glucógeno muscular."
+      },
+      "active": {
+        "label": "Activo — 6–7 días / semana",
+        "desc": "Entrenamiento de alta frecuencia e intensidad casi a diario. Requiere un soporte calórico sólido para prevenir el catabolismo."
+      },
+      "very_active": {
+        "label": "Muy Activo — Trabajo físico + entrenamiento",
+        "desc": "Entrenamiento diario intenso combinado con una ocupación físicamente exigente. Genera la quema metabólica máxima."
+      }
+    }
+  },
+  "step6": {
+    "title": "AJUSTE DE PRECISIÓN",
+    "desc": "Los datos opcionales mejoran la calibración.",
+    "bodyFatLabel": "% DE GRASA CORPORAL",
+    "bodyFatSublabel": "ACTIVAR MODO PRECISIÓN",
+    "bodyFatHint": "Activa el modo de precisión si conoces tu porcentaje de grasa corporal.",
+    "somatotypeTweakLabel": "AJUSTE DE SOMATOTIPO",
+    "somatotypeTweakSublabel": "AJUSTE DE LÍNEA BASE METABÓLICA",
+    "calibrateBtn": "CALIBRAR MOTOR METABÓLICO →",
+    "calibratingBtn": "CALIBRANDO..."
+  },
+  "dashboard": {
+    "resultsTitle": "Tus Resultados",
+    "dailyTarget": "Objetivo Diario",
+    "tdeeBaseline": "Referencia TDEE",
+    "tdeeSubtitle": "Optimizado para tu objetivo de transformación.",
+    "basalMetabolicRate": "Tasa Metabólica Basal",
+    "macroBreakdown": "Distribución de Macros y Lógica",
+    "protein": "Proteína",
+    "proteinDesc": "Bloque constructor para la retención muscular.",
+    "carbohydrates": "Carbohidratos",
+    "carbsDesc": "Energía estratégica para la fase {{goal}}.",
+    "fats": "Grasas",
+    "fatsDesc": "Combustible optimizado para el metabolismo {{bodyType}}.",
+    "personalizationScore": "Puntuación de Personalización",
+    "accuracyLabel": "Nivel de precisión de la sincronización",
+    "fiberGrams": "Gramos de Fibra",
+    "waterLiters": "Litros de Agua",
+    "stepTarget": "Objetivo de Pasos",
+    "buildMealPlan": "Crear Mi Plan de Comidas",
+    "metabolicInsightTitle": "Insight Metabólico",
+    "metabolicInsightSubtitle": "Lógica de Precisión • Análisis del Motor de Macros",
+    "liveAnalysis": "Análisis en Vivo",
+    "awaitingSync": "Esperando sincronización metabólica. Realiza un cálculo para generar tu insight de coaching de IA personalizado."
+  }
+}

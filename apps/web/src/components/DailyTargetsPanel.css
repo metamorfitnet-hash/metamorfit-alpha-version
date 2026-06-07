@@ -1,0 +1,313 @@
+.daily-targets-panel {
+  --color-bg-panel: #0d0d0d;
+  --color-bg-cell: #0f0f0f;
+  --color-bg-track: #0a0a0a;
+  --color-border: #222222;
+  --color-border-subtle: #1a1a1a;
+  --color-gold: #d4af37;
+  --color-white: #ffffff;
+  --color-text-secondary: #e0e0e0;
+  --color-text-muted: #cccccc;
+  --color-text-dim: #bbbbbb;
+  --color-tick: #282828;
+  --color-gold-glow: rgba(212, 175, 55, 0.6);
+
+  background: var(--color-bg-panel);
+  padding: 36px 48px 32px;
+  width: 100%;
+  position: relative;
+  border: 0.5px solid var(--color-border);
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.daily-targets-panel * {
+  box-sizing: border-box;
+}
+
+/* Decorative Gold Lines */
+.daily-targets-panel::before,
+.daily-targets-panel::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-gold) 30%, var(--color-gold) 70%, transparent);
+}
+
+.daily-targets-panel::before {
+  top: 0;
+}
+
+.daily-targets-panel::after {
+  bottom: 0;
+}
+
+/* Section 1 — Title Block */
+.title-block {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 24px;
+}
+
+.panel-title {
+  font-family: var(--font-bebas), "Bebas Neue", "Arial Narrow", Arial, sans-serif;
+  font-size: 44px;
+  font-weight: 400;
+  color: var(--color-gold);
+  letter-spacing: 12px;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.hero-calorie-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 0;
+}
+
+.hero-calorie-number {
+  font-family: var(--font-dm-sans), "DM Sans", Arial, sans-serif;
+  font-size: 82px;
+  font-weight: 600;
+  color: var(--color-white);
+  letter-spacing: -3px;
+  line-height: 1;
+}
+
+.calorie-unit {
+  font-family: var(--font-dm-sans), "DM Sans", Arial, sans-serif;
+  font-size: 17px;
+  font-weight: 300;
+  color: var(--color-text-secondary);
+  letter-spacing: 3px;
+  padding-bottom: 0;
+  text-transform: uppercase;
+}
+
+/* Section 2 — Calorie Progress Bar */
+.calorie-progress-section {
+  margin-bottom: 36px;
+}
+
+.calorie-bar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 10px;
+}
+
+.calorie-bar-label {
+  font-family: var(--font-dm-sans), "DM Sans", Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: #cccccc;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+}
+
+.calorie-bar-data {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  font-family: var(--font-dm-sans), "DM Sans", Arial, sans-serif;
+  font-size: 14px;
+}
+
+.data-item {
+  color: #eeeeee;
+  font-weight: 400;
+}
+
+.data-item.remaining {
+  color: var(--color-gold);
+  font-weight: 500;
+}
+
+.data-item.over {
+  color: #c0392b;
+  font-weight: 500;
+}
+
+.data-divider {
+  color: #333;
+}
+
+.progress-track-wrapper {
+  height: 3px;
+  background: var(--color-bg-track);
+  border-radius: 2px;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--color-gold);
+  width: var(--fill-width, 0%);
+  border-radius: 2px;
+  transition: width 0.5s ease-out;
+  position: relative;
+}
+
+.fill-glow {
+  position: absolute;
+  right: -4px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 10px;
+  height: 10px;
+  background: radial-gradient(circle, var(--color-gold-glow) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* Section 3 — Macro Gauges */
+.macro-gauges-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.macro-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.macro-section-label {
+  font-family: var(--font-dm-sans), "DM Sans", Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+
+.gauge-container {
+  width: 148px;
+  height: 148px;
+  margin-bottom: 14px;
+  position: relative;
+}
+
+.gauge-svg {
+  width: 100%;
+  height: 100%;
+}
+
+.gauge-progress-arc {
+  filter: url(#gauge-glow);
+}
+
+.gauge-consumed-val {
+  font-family: Arial, sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  fill: var(--color-white);
+}
+
+.gauge-consumed-label {
+  font-family: Arial, sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  fill: var(--color-text-muted);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+/* Data Cell Block */
+.data-cell-block {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: #222;
+  border: 1px solid #222;
+  border-radius: 4px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.data-cell {
+  background: #050505;
+  padding: 14px 12px;
+  text-align: center;
+}
+
+.cell-label {
+  font-family: var(--font-dm-sans), "DM Sans", Arial, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  color: #ffffff;
+  opacity: 0.9;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.cell-value {
+  font-family: var(--font-dm-sans), "DM Sans", Arial, sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.cell-value.target {
+  color: var(--color-white);
+}
+
+.cell-value.left {
+  color: var(--color-gold);
+}
+
+.cell-value.over {
+  color: #c0392b;
+}
+
+/* Section 4 — Footer Line */
+.footer-line-section {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.footer-hairline {
+  flex: 1;
+  height: 0.5px;
+  background: var(--color-border);
+}
+
+.footer-tagline {
+  font-family: var(--font-dm-sans), "DM Sans", Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 300;
+  font-style: italic;
+  color: var(--color-text-dim);
+  letter-spacing: 2px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .daily-targets-panel {
+    padding: 28px 20px 24px;
+  }
+  
+  .macro-gauges-grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .hero-calorie-number {
+    font-size: 60px;
+  }
+
+  .footer-tagline {
+    white-space: normal;
+  }
+}
