@@ -75,7 +75,7 @@ export async function handleSendPdf(request: Request, env: any, ctx: any, corsHe
 			await updateUserPlanStatus(env, jobId, 'emailing', r2Key || undefined);
 			Sentry.addBreadcrumb({ category: 'pipeline', message: `PDF stream generated and uploaded to R2`, level: 'info' });
 
-			const downloadUrl = `https://beta.metamorfit.pro/api/download/${jobId}`;
+			const downloadUrl = `https://metamorfit.online/api/download/${jobId}`;
 
 			// C. Email Delivery — runs BEFORE CRM so it always succeeds
 			currentErrorCode = 'EMAIL_SEND_FAIL';

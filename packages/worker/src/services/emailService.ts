@@ -1,9 +1,9 @@
 import { renderEmail } from '../PersonalizedPlanEmail';
 import { withRetry } from '../utils/retry';
 
-export async function sendPlanEmail(env: any, email: string, fullName: string, downloadUrl: string, jobId: string) {
+export async function sendPlanEmail(env: any, email: string, fullName: string, downloadUrl: string, jobId: string, locale: string = 'en') {
 	const firstName = (fullName || "").split(" ")[0] || fullName;
-	const htmlContent = await renderEmail(fullName, downloadUrl);
+	const htmlContent = await renderEmail(fullName, downloadUrl, locale);
 
 	return await withRetry(async () => {
 		const response = await fetch("https://api.brevo.com/v3/smtp/email", {
@@ -15,7 +15,7 @@ export async function sendPlanEmail(env: any, email: string, fullName: string, d
 			body: JSON.stringify({
 				sender: { email: "contact@metamorfit.pro", name: "Metamorfit" },
 				to: [{ email: email, ...(fullName ? { name: fullName } : {}) }],
-				subject: `Your Personalized Plan — ${firstName}`,
+				subject: locale === 'es' ? `Tu Plan Personalizado — ${firstName}` : `Your Personalized Plan — ${firstName}`,
 				htmlContent: htmlContent
 			})
 		});

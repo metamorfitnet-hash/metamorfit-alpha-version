@@ -3,7 +3,7 @@ import { PdfRequestSchema, DeliveryPayload } from '../schema/pdfRequest';
 import { verifyHmacSignature } from '../utils/auth';
 import { initializeJobStatus, updateJobStatus } from '../db/kvStatus';
 import { insertUserPlan, updateUserPlanStatus, updateUserPlanMetrics, updateUserPlanError } from '../db/database';
-import { getAiExplanation, ExplanationInput } from '../services/aiService';
+import { getAiExplanation, ExplanationInput } from '../explanation';
 import { renderMetamorfitPdf } from '../renderer';
 import { uploadPdfToR2 } from '../services/r2Service';
 import { createSystemeContact } from '../services/crmService';
@@ -55,6 +55,7 @@ export async function handleSendPdf(request: Request, env: any, ctx: any, corsHe
 				Sentry.addBreadcrumb({ category: 'pipeline', message: 'Starting AI explanation generation', level: 'info' });
 				const aiStart = Date.now();
 				const aiResult = await getAiExplanation(env, {
+					locale: payload.locale || 'en',
 					identity: payload.identity,
 					metabolicProfile: payload.metabolicProfile,
 					personalizationScore: payload.personalization?.personalizationScore || 100
@@ -75,7 +76,7 @@ export async function handleSendPdf(request: Request, env: any, ctx: any, corsHe
 			await updateUserPlanStatus(env, jobId, 'emailing', r2Key);
 			Sentry.addBreadcrumb({ category: 'pipeline', message: `PDF stream generated and uploaded to R2`, level: 'info' });
 
-			const downloadUrl = `https://beta.metamorfit.pro/api/download/${jobId}`;
+			const downloadUrl = `https://metamorfit.online/api/download/${jobId}`;
 
 			// C. Email Delivery — runs BEFORE CRM so it always succeeds
 			currentErrorCode = 'EMAIL_SEND_FAIL';

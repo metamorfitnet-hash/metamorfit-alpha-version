@@ -49,6 +49,12 @@
   --animate-lp-fade-up: fadeUp_lp 0.65s 0.05s cubic-bezier(0.16, 1, 0.3, 1) both;
   --animate-lp-fade-in: fadeIn_lp 0.4s ease both;
   --animate-lp-pulse-glow: pulseGlow_lp 3.5s ease-in-out infinite;
+  
+  @keyframes fade-in-up {
+    0% { opacity: 0; transform: translateY(10px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  --animate-fade-in-up: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 
   --ease-lp-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-lp-std: cubic-bezier(0.25, 0.46, 0.45, 0.94);

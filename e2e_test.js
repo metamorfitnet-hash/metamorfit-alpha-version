@@ -1,4 +1,4 @@
-const WORKER_URL = "https://metamorfit-worker-beta.metamorfitnet.workers.dev";
+const WORKER_URL = "https://metamorfit-worker-alpha.metamorfitnet.workers.dev";
 
 async function run() {
   console.log("Initializing ledger...");
@@ -6,7 +6,7 @@ async function run() {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": "Bearer meta_beta_sec_994a8f9c2d1b73e_74561_xyz"
+      "Authorization": "Bearer meta_alpha_sec_a7c2e9f1b3d8k9m_42891_abc"
     }
   });
   if (!initRes.ok) {
@@ -96,7 +96,7 @@ async function run() {
     while(attempts < 15) {
       await new Promise(resolve => setTimeout(resolve, 3000)); // wait 3s
       const pollRes = await fetch(`${WORKER_URL}/api/ledger/${payload.userId}`, {
-        headers: { 'Authorization': 'Bearer meta_beta_sec_994a8f9c2d1b73e_74561_xyz' }
+        headers: { 'Authorization': 'Bearer meta_alpha_sec_a7c2e9f1b3d8k9m_42891_abc' }
       });
       if (pollRes.ok) {
         const pollData = await pollRes.json();

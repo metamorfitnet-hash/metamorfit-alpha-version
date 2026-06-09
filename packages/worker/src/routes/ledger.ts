@@ -1,12 +1,12 @@
 import { Env, LedgerEntry } from "../index";
-import { getAiExplanation } from "../services/aiService";
+import { getAiExplanation } from "../explanation";
 
 /**
  * Middleware: Validates the Authorization Bearer token against MM_UI_SECRET
  */
 const validateAuth = (request: Request, env: any) => {
   const authHeader = request.headers.get("Authorization");
-  const uiSecret = env.MM_UI_SECRET || env.HMAC_SECRET || 'meta_beta_sec_994a8f9c2d1b73e_74561_xyz';
+  const uiSecret = env.MM_UI_SECRET || env.HMAC_SECRET || 'meta_alpha_sec_a7c2e9f1b3d8k9m_42891_abc';
   
   // High-resilience bypass for staging/beta deployment token mismatches
   if (authHeader === "Bearer undefined" || authHeader === "Bearer null") {
@@ -94,12 +94,13 @@ function calculateMetrics(data: any) {
 }
 
 function generateCards(data: any, metrics: any) {
+  const isEs = data.locale === 'es';
   const cards = [
     {
-      title: "METABOLIC FORMULA",
+      title: isEs ? "FÓRMULA METABÓLICA" : "METABOLIC FORMULA",
       description: data.bodyFatPercent 
-        ? "Utilizing Katch-McArdle logic for elite precision based on your Lean Body Mass." 
-        : "Utilizing Mifflin-St Jeor formula to establish your biological baseline.",
+        ? (isEs ? "Utilizando la lógica de Katch-McArdle para precisión de élite basada en tu Masa Corporal Magra." : "Utilizing Katch-McArdle logic for elite precision based on your Lean Body Mass.")
+        : (isEs ? "Utilizando la fórmula de Mifflin-St Jeor para establecer tu base biológica." : "Utilizing Mifflin-St Jeor formula to establish your biological baseline."),
       type: "METABOLIC_FORMULA"
     }
   ];
@@ -108,20 +109,20 @@ function generateCards(data: any, metrics: any) {
   const somatotype = data.somatotype?.toLowerCase() || 'mesomorph';
   if (somatotype === 'ectomorph') {
     cards.push({
-      title: "SOMATOTYPE ALIGNMENT",
-      description: "Ectomorphic high-frequency carb sensitivity requires aggressive nutrient density to bypass oxidation and trigger anabolic growth.",
+      title: isEs ? "ALINEACIÓN DE SOMATOTIPO" : "SOMATOTYPE ALIGNMENT",
+      description: isEs ? "La sensibilidad alta a los carbohidratos de los ectomorfos requiere densidad de nutrientes agresiva para evitar la oxidación y activar el crecimiento anabólico." : "Ectomorphic high-frequency carb sensitivity requires aggressive nutrient density to bypass oxidation and trigger anabolic growth.",
       type: "SOMATOTYPE_ALIGNMENT"
     });
   } else if (somatotype === 'endomorph') {
     cards.push({
-      title: "SOMATOTYPE ALIGNMENT",
-      description: "Endomorphic profile responds exceptionally well to high-protein satiety and controlled carbohydrate pacing for maximum insulin efficiency.",
+      title: isEs ? "ALINEACIÓN DE SOMATOTIPO" : "SOMATOTYPE ALIGNMENT",
+      description: isEs ? "El perfil endomorfo responde excepcionalmente bien a la saciedad rica en proteínas y a la regulación controlada de carbohidratos para lograr la máxima eficiencia de la insulina." : "Endomorphic profile responds exceptionally well to high-protein satiety and controlled carbohydrate pacing for maximum insulin efficiency.",
       type: "SOMATOTYPE_ALIGNMENT"
     });
   } else {
     cards.push({
-      title: "SOMATOTYPE ALIGNMENT",
-      description: "Mesomorphic profile allows for robust recovery, optimal protein synthesis, and highly efficient macronutrient partitioning.",
+      title: isEs ? "ALINEACIÓN DE SOMATOTIPO" : "SOMATOTYPE ALIGNMENT",
+      description: isEs ? "El perfil mesomorfo permite una recuperación robusta, una síntesis de proteínas óptima y una partición de macronutrientes altamente eficiente." : "Mesomorphic profile allows for robust recovery, optimal protein synthesis, and highly efficient macronutrient partitioning.",
       type: "SOMATOTYPE_ALIGNMENT"
     });
   }
@@ -130,33 +131,33 @@ function generateCards(data: any, metrics: any) {
   const goal = data.goal?.toLowerCase() || 'maintain';
   if (goal === 'cut') {
     cards.push({
-      title: "NITROGEN BALANCE",
-      description: "Elevated protein ratio designed to protect lean mass and maintain high thermic effect of feeding during caloric deficit.",
+      title: isEs ? "BALANCE DE NITRÓGENO" : "NITROGEN BALANCE",
+      description: isEs ? "Proporción elevada de proteínas diseñada para proteger la masa magra y mantener el alto efecto térmico de los alimentos durante el déficit calórico." : "Elevated protein ratio designed to protect lean mass and maintain high thermic effect of feeding during caloric deficit.",
       type: "NITROGEN_BALANCE"
     });
   } else if (goal === 'bulk') {
     cards.push({
-      title: "NUTRIENT SURPLUS",
-      description: "Strategic energy surplus tailored to maximize muscular hypertrophy while minimizing adipose tissue accretion.",
+      title: isEs ? "SUPERÁVIT DE NUTRIENTES" : "NUTRIENT SURPLUS",
+      description: isEs ? "Superávit energético estratégico diseñado para maximizar la hipertrofia muscular y minimizar el aumento de tejido adiposo." : "Strategic energy surplus tailored to maximize muscular hypertrophy while minimizing adipose tissue accretion.",
       type: "NUTRIENT_SURPLUS"
     });
   } else if (goal === 'recomp') {
     cards.push({
-      title: "RECOMPOSITION FACTOR",
-      description: "Caloric target calibrated precisely at biological maintenance with high-protein bias to facilitate simultaneous fat loss and muscle gain.",
+      title: isEs ? "FACTOR DE RECOMPOSICIÓN" : "RECOMPOSITION FACTOR",
+      description: isEs ? "Objetivo calórico calibrado exactamente en mantenimiento biológico con sesgo alto en proteínas para facilitar la pérdida de grasa y el desarrollo muscular simultáneos." : "Caloric target calibrated precisely at biological maintenance with high-protein bias to facilitate simultaneous fat loss and muscle gain.",
       type: "RECOMPOSITION_FACTOR"
     });
   } else {
     cards.push({
-      title: "METABOLIC STEADY-STATE",
-      description: "Energy balance calibrated to support recovery, peak performance, and weight maintenance without metabolic slowdown.",
+      title: isEs ? "ESTADO ESTABLE METABÓLICO" : "METABOLIC STEADY-STATE",
+      description: isEs ? "Equilibrio energético calibrado para favorecer la recuperación, el máximo rendimiento y el mantenimiento del peso sin desaceleración metabólica." : "Energy balance calibrated to support recovery, peak performance, and weight maintenance without metabolic slowdown.",
       type: "METABOLIC_STEADY_STATE"
     });
   }
 
   cards.push({
-    title: "ACTIVITY SCALE",
-    description: `Your ${data.activityLevel || 'moderate'} profile requires ${Math.round(metrics.tdee)} kcal just to maintain systemic homeostasis.`,
+    title: isEs ? "ESCALA DE ACTIVIDAD" : "ACTIVITY SCALE",
+    description: isEs ? `Tu perfil ${data.activityLevel || 'moderado'} requiere ${Math.round(metrics.tdee)} kcal solo para mantener la homeostasis sistémica.` : `Your ${data.activityLevel || 'moderate'} profile requires ${Math.round(metrics.tdee)} kcal just to maintain systemic homeostasis.`,
     type: "TRAINING_INTENSITY"
   });
 

@@ -15,15 +15,17 @@ import { render } from "@react-email/render";
 interface PersonalizedPlanEmailProps {
   name: string;
   downloadUrl: string;
+  locale?: string;
 }
 
-export const PersonalizedPlanEmail: React.FC<PersonalizedPlanEmailProps> = ({ name, downloadUrl }) => {
+export const PersonalizedPlanEmail: React.FC<PersonalizedPlanEmailProps> = ({ name, downloadUrl, locale = 'en' }) => {
   const firstName = name.split(" ")[0] || name;
+  const isEs = locale === 'es';
 
   return (
-    <Html lang="en">
+    <Html lang={isEs ? "es" : "en"}>
       <Head />
-      <Preview>Your Metamorfit personalized plan is ready.</Preview>
+      <Preview>{isEs ? "Tu plan personalizado de Metamorfit está listo." : "Your Metamorfit personalized plan is ready."}</Preview>
       <Body style={styles.body}>
         <Container style={styles.container}>
           <Section style={styles.header}>
@@ -31,13 +33,13 @@ export const PersonalizedPlanEmail: React.FC<PersonalizedPlanEmailProps> = ({ na
           </Section>
           <Hr style={styles.divider} />
           <Section style={styles.content}>
-            <Heading style={styles.heading}>Ready, {firstName}</Heading>
-            <Text style={styles.paragraph}>Your personalized plan is ready for download.</Text>
-            <a href={downloadUrl} style={styles.button}>Download Your Plan</a>
+            <Heading style={styles.heading}>{isEs ? `Listo, ${firstName}` : `Ready, ${firstName}`}</Heading>
+            <Text style={styles.paragraph}>{isEs ? "Tu plan personalizado está listo para descargar." : "Your personalized plan is ready for download."}</Text>
+            <a href={downloadUrl} style={styles.button}>{isEs ? "Descargar tu Plan" : "Download Your Plan"}</a>
           </Section>
           <Hr style={styles.divider} />
           <Section style={styles.footer}>
-            <Text style={styles.footerText}>Delivered by Metamorfit</Text>
+            <Text style={styles.footerText}>{isEs ? "Entregado por Metamorfit" : "Delivered by Metamorfit"}</Text>
           </Section>
         </Container>
       </Body>
@@ -113,6 +115,6 @@ const styles = {
   },
 };
 
-export async function renderEmail(name: string, downloadUrl: string) {
-  return await render(<PersonalizedPlanEmail name={name} downloadUrl={downloadUrl} />);
+export async function renderEmail(name: string, downloadUrl: string, locale: string = 'en') {
+  return await render(<PersonalizedPlanEmail name={name} downloadUrl={downloadUrl} locale={locale} />);
 }

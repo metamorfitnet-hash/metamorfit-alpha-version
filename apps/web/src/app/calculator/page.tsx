@@ -8,10 +8,13 @@ import { useOnboardingSession } from "@/hooks/useOnboardingSession";
 import { Header } from "@/components/Header";
 import { CalculatorForm } from "../components/Calculator/CalculatorForm";
 import { ResultsPanel } from "../components/Calculator/ResultsPanel";
+import { useTranslation } from "react-i18next";
 
 function CalculatorContent() {
   const { finalized, sessionPayload } = useOnboardingSession();
   const router = useRouter();
+  const { i18n } = useTranslation();
+  const isEs = i18n.language === 'es';
 
   // If we haven't recovered session yet, wait a moment.
   // If we determine it's definitely not finalized, redirect to onboarding.
@@ -69,10 +72,10 @@ function CalculatorContent() {
         ⚡
       </div>
       <h3 className="mb-4 tracking-[0.3em] text-mm-bone/40 uppercase text-center font-heading">
-        Synchronizing Engine...
+        {isEs ? "Sincronizando Motor..." : "Synchronizing Engine..."}
       </h3>
       <p className="max-w-xs text-base text-mm-bone/30 font-body leading-relaxed mx-auto">
-        Retrieving your metabolic targets. If you haven't calibrated yet, you will be redirected.
+        {isEs ? "Recuperando tus objetivos metabólicos. Si aún no te has calibrado, serás redirigido." : "Retrieving your metabolic targets. If you haven't calibrated yet, you will be redirected."}
       </p>
     </div>
   );
@@ -80,6 +83,8 @@ function CalculatorContent() {
 
 export default function CalculatorPage() {
   const { finalized } = useOnboardingSession();
+  const { i18n } = useTranslation();
+  const isEs = i18n.language === 'es';
 
   return (
     <div className="animate-fadeIn min-h-screen selection:bg-mm-gold/30 flex flex-col">
@@ -94,15 +99,17 @@ export default function CalculatorPage() {
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-mm-gold/5 blur-[120px] rounded-full pointer-events-none" />
           <div className="inline-block px-5 py-1.5 mb-8 rounded-full bg-mm-gold/5 border border-mm-gold/10 relative z-10">
             <span className="text-mm-gold text-sm font-heading tracking-[0.3em] uppercase opacity-80">
-              {finalized ? "Engine Synchronized" : "Precision Metabolic Engine v2.0"}
+              {finalized 
+                ? (isEs ? "Motor Sincronizado" : "Engine Synchronized") 
+                : (isEs ? "Motor Metabólico de Precisión v2.0" : "Precision Metabolic Engine v2.0")}
             </span>
           </div>
           <h1 className="relative z-10 mb-8">
-            Macro Breakdown <span className="text-mm-gold">Results.</span>
+            {isEs ? "Resultados de" : "Macro Breakdown"} <span className="text-mm-gold">{isEs ? "Desglose de Macros." : "Results."}</span>
           </h1>
         </div>
 
-        <Suspense fallback={<div className="text-mm-gold font-heading text-center py-32 text-2xl tracking-widest animate-pulse">Initializing Engine...</div>}>
+        <Suspense fallback={<div className="text-mm-gold font-heading text-center py-32 text-2xl tracking-widest animate-pulse">{isEs ? "Inicializando Motor..." : "Initializing Engine..."}</div>}>
           <CalculatorContent />
         </Suspense>
 

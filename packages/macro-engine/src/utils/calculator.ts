@@ -233,66 +233,73 @@ export function calculateMacros(data: CalculatorInput) {
 
   const notes: any[] = [];
   let personalizationScore = 40;
+  
+  const locale = data.locale || 'en';
+  const isEs = locale === 'es';
 
   if (precisionMode) {
     personalizationScore += 15;
     notes.push({
-      category: 'Precision Targeting',
-      text: 'Body-fat-adjusted, performance-grade macros.'
+      category: isEs ? 'Objetivo de Precisión' : 'Precision Targeting',
+      text: isEs ? 'Macros de grado de rendimiento, ajustados a la grasa corporal.' : 'Body-fat-adjusted, performance-grade macros.'
     });
   }
 
   if (somatotypeTweak) {
     personalizationScore += 10;
     notes.push({
-      category: 'Nutrient Partitioning',
-      text: 'Adjusted for specific energy storage assumptions.'
+      category: isEs ? 'Partición de Nutrientes' : 'Nutrient Partitioning',
+      text: isEs ? 'Ajustado para suposiciones de almacenamiento de energía específicas.' : 'Adjusted for specific energy storage assumptions.'
     });
   }
 
   if (typeof bodyFatPercent === 'number' && bodyFatPercent > 0) {
     personalizationScore += 20;
     notes.push({
-      category: 'Metabolic Formula',
-      text: `Katch-McArdle (${bodyFatPercent}% BF Adjusted)`
+      category: isEs ? 'Fórmula Metabólica' : 'Metabolic Formula',
+      text: `Katch-McArdle (${bodyFatPercent}% BF ${isEs ? 'Ajustado' : 'Adjusted'})`
     });
     
     if (bodyFatPercent > 25) {
       notes.push({
-        category: 'Insulin Sensitivity',
-        text: 'Carbohydrates reduced to support metabolic flexibility.'
+        category: isEs ? 'Sensibilidad a la Insulina' : 'Insulin Sensitivity',
+        text: isEs ? 'Carbohidratos reducidos para apoyar la flexibilidad metabólica.' : 'Carbohydrates reduced to support metabolic flexibility.'
       });
     } else if (bodyFatPercent < 12) {
       notes.push({
-        category: 'Metabolic Flexibility',
-        text: 'Carbohydrates increased to support training fullness.'
+        category: isEs ? 'Flexibilidad Metabólica' : 'Metabolic Flexibility',
+        text: isEs ? 'Carbohidratos aumentados para apoyar el volumen de entrenamiento.' : 'Carbohydrates increased to support training fullness.'
       });
     }
   }
 
   if (activityLevel) {
     let activityText = '';
-    if (activityLevel === 'active' || activityLevel === 'very_active') activityText = 'High-Intensity Volume Scaling';
-    else if (activityLevel === 'moderate') activityText = 'Moderate Performance Scaling';
-    else activityText = 'Baseline Lifestyle Scaling';
+    if (activityLevel === 'active' || activityLevel === 'very_active') activityText = isEs ? 'Escalado de Volumen de Alta Intensidad' : 'High-Intensity Volume Scaling';
+    else if (activityLevel === 'moderate') activityText = isEs ? 'Escalado de Rendimiento Moderado' : 'Moderate Performance Scaling';
+    else activityText = isEs ? 'Escalado de Estilo de Vida Base' : 'Baseline Lifestyle Scaling';
 
     notes.push({
-      category: 'Activity Scale',
+      category: isEs ? 'Escala de Actividad' : 'Activity Scale',
       text: activityText
     });
   }
 
   // Goal Logic
-  const goalNames: Record<string, string> = { fat_loss: 'Cut', maintenance: 'Maintenance', muscle_gain: 'Lean Bulk', recomp: 'Recomposition' };
-  
   let goalText = '';
-  if (goal === 'fat_loss') goalText = '15% Cut Protocol';
-  else if (goal === 'muscle_gain') goalText = '15% Lean Bulk Protocol';
-  else if (goal === 'recomp') goalText = 'High-Protein Maintenance Protocol';
-  else goalText = 'Standard Maintenance Protocol';
+  if (goal === 'fat_loss') goalText = isEs ? 'Protocolo de Corte al 15%' : '15% Cut Protocol';
+  else if (goal === 'muscle_gain') goalText = isEs ? 'Protocolo de Volumen Limpio al 15%' : '15% Lean Bulk Protocol';
+  else if (goal === 'recomp') goalText = isEs ? 'Protocolo de Mantenimiento Alto en Proteínas' : 'High-Protein Maintenance Protocol';
+  else goalText = isEs ? 'Protocolo de Mantenimiento Estándar' : 'Standard Maintenance Protocol';
+
+  let goalCategory = '';
+  if (goal === 'fat_loss') goalCategory = isEs ? 'Déficit Calórico' : 'Caloric Deficit';
+  else if (goal === 'muscle_gain') goalCategory = isEs ? 'Superávit Calórico' : 'Caloric Surplus';
+  else if (goal === 'recomp') goalCategory = isEs ? 'Recomposición' : 'Caloric Recomposition';
+  else goalCategory = isEs ? 'Mantenimiento' : 'Caloric Maintenance';
 
   notes.push({
-    category: `Caloric ${goal === 'fat_loss' ? 'Deficit' : goal === 'muscle_gain' ? 'Surplus' : goal === 'recomp' ? 'Recomposition' : 'Maintenance'}`,
+    category: goalCategory,
     text: goalText
   });
 

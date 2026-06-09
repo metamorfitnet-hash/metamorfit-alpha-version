@@ -9,6 +9,7 @@ import { Page1, Page2, Page3, NotesPage, MealDetailsPage, CalibrationRecapPage, 
 export type RenderPayload = {
   fullName?: string;
   personalizationScore?: number;
+  locale?: string;
   identity: Identity;
   metabolicProfile: MetabolicProfile;
   personalization: Personalization;
@@ -135,16 +136,16 @@ export async function renderMetamorfitPdf(rawPayload: RenderPayload, env?: any):
   const pages: React.ReactNode[] = [];
 
   // Page 1
-  pages.push(<Page1 key="p1" identity={payload.identity} personalization={payload.personalization} totalPages={totalPages} />);
+  pages.push(<Page1 key="p1" identity={payload.identity} personalization={payload.personalization} totalPages={totalPages} locale={payload.locale} />);
   currentPageNum++;
 
   // Page 2
-  pages.push(<Page2 key="p2" identity={payload.identity} metabolicProfile={payload.metabolicProfile} notes={[]} totalPages={totalPages} />);
+  pages.push(<Page2 key="p2" identity={payload.identity} metabolicProfile={payload.metabolicProfile} notes={[]} totalPages={totalPages} locale={payload.locale} />);
   currentPageNum++;
 
   // Page 3: Notes
   if (hasNotes) {
-    pages.push(<NotesPage key="pn" intelligenceNotes={payload.intelligenceNotes} explanation={payload.explanation} pageNumber={currentPageNum++} totalPages={totalPages} />);
+    pages.push(<NotesPage key="pn" intelligenceNotes={payload.intelligenceNotes} explanation={payload.explanation} pageNumber={currentPageNum++} totalPages={totalPages} locale={payload.locale} />);
   }
 
   // Page 4+: Meals
@@ -155,13 +156,13 @@ export async function renderMetamorfitPdf(rawPayload: RenderPayload, env?: any):
     const chunk = remainingMealsToPaginate.slice(0, MEALS_PER_PAGE);
     remainingMealsToPaginate = remainingMealsToPaginate.slice(MEALS_PER_PAGE);
     
-    pages.push(<MealDetailsPage key={`pm-${currentPageNum}`} meals={chunk} metabolicProfile={isFirstMealPage ? payload.metabolicProfile : undefined} pageNumber={currentPageNum++} totalPages={totalPages} showTargets={isFirstMealPage} />);
+    pages.push(<MealDetailsPage key={`pm-${currentPageNum}`} meals={chunk} metabolicProfile={isFirstMealPage ? payload.metabolicProfile : undefined} pageNumber={currentPageNum++} totalPages={totalPages} showTargets={isFirstMealPage} locale={payload.locale} />);
     isFirstMealPage = false;
   }
 
   // Final Page
   if (payload.delivered) {
-    pages.push(<CalibrationRecapPage key="pc" metabolicProfile={payload.metabolicProfile} delivered={payload.delivered} pageNumber={currentPageNum++} totalPages={totalPages} />);
+    pages.push(<CalibrationRecapPage key="pc" metabolicProfile={payload.metabolicProfile} delivered={payload.delivered} pageNumber={currentPageNum++} totalPages={totalPages} locale={payload.locale} />);
   }
 
   // Render React tree to static HTML string

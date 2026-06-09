@@ -115,7 +115,7 @@ export async function handleGenerate(request: Request, env: any, ctx: any, corsH
 			const r2Key = await uploadPdfToR2(env, jobId, pdfStream);
 			
 			// Worker-relative URL for the frontend / API consumers
-			const downloadUrl = `https://beta.metamorfit.pro/api/download/${jobId}`;
+			const downloadUrl = `https://metamorfit.online/api/download/${jobId}`;
 
 			await updateJobStatus(env, jobId, { 
 				status: 'pdf_stored', 

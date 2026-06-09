@@ -3,7 +3,7 @@ import { PdfRequestSchema, DeliveryPayload } from '../schema/pdfRequest';
 import { verifyHmacSignature } from '../utils/auth';
 import { initializeJobStatus, updateJobStatus, getJobStatus } from '../db/kvStatus';
 import { insertUserPlan, updateUserPlanStatus, updateUserPlanMetrics, updateUserPlanError } from '../db/database';
-import { getAiExplanation, ExplanationInput } from '../services/aiService';
+import { getAiExplanation, ExplanationInput } from '../explanation';
 import { renderMetamorfitPdf } from '../renderer';
 import { uploadPdfToR2 } from '../services/r2Service';
 import { createSystemeContact } from '../services/crmService';
@@ -35,6 +35,7 @@ export async function handleGenerate(request: Request, env: any, ctx: any, corsH
 	const payload = validation.data as DeliveryPayload;
 	const jobId = (rawPayload as any).userId || crypto.randomUUID();
 	const { email, fullName } = payload;
+	const locale = payload.locale || 'en';
 
 	// 1. Initial State - KV Ledger
 	await initializeJobStatus(env, jobId, payload);
@@ -78,7 +79,7 @@ export async function handleGenerate(request: Request, env: any, ctx: any, corsH
 					macroData = await macroRes.json();
 				} catch (e) {
 					console.log("MACRO_ENGINE binding failed, falling back to production API", e);
-					const macroUrl = env.MACRO_ENGINE_URL || "https://beta.metamorfit.pro";
+					const macroUrl = env.MACRO_ENGINE_URL || "https://metamorfit.online";
 					const macroRes = await fetch(`${macroUrl}/api/calculate`, {
 						method: "POST",
 						headers: { "Content-Type": "application/json" },
@@ -190,7 +191,7 @@ export async function handleGenerate(request: Request, env: any, ctx: any, corsH
 			const r2Key = await uploadPdfToR2(env, jobId, pdfStream);
 			
 			// Worker-relative URL for the frontend / API consumers
-			const downloadUrl = `https://beta.metamorfit.pro/api/download/${jobId}`;
+			const downloadUrl = `https://metamorfit-worker-alpha.metamorfitnet.workers.dev/api/download/${jobId}`;
 
 			await updateJobStatus(env, jobId, { 
 				status: 'pdf_stored', 
@@ -201,7 +202,7 @@ export async function handleGenerate(request: Request, env: any, ctx: any, corsH
 			// D. Email Delivery (using R2 hosted link)
 			currentErrorCode = 'EMAIL_SEND_FAIL';
 			Sentry.addBreadcrumb({ category: 'pipeline', message: `Starting Brevo email delivery to ${email}`, level: 'info' });
-			await sendPlanEmail(env, email, fullName, downloadUrl, jobId);
+			await sendPlanEmail(env, email, fullName, downloadUrl, jobId, locale);
 			
 			await updateJobStatus(env, jobId, { status: 'delivered' });
 			Sentry.addBreadcrumb({ category: 'pipeline', message: 'Email delivered successfully via Brevo', level: 'info' });

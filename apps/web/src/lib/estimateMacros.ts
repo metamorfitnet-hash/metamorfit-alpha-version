@@ -3,7 +3,7 @@
  * Can be used directly from client components or imported by API routes.
  */
 
-const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_A_URL || "https://metamorfit-worker-beta.metamorfitnet.workers.dev";
+const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_A_URL || "https://metamorfit-worker-alpha.metamorfitnet.workers.dev";
 
 export interface MacroEstimate {
   calories: number;

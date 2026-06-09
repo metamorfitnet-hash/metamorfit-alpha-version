@@ -10,8 +10,8 @@ import * as Sentry from '@sentry/cloudflare';
 export function getSentryConfig(env: any): Sentry.CloudflareOptions {
 	return {
 		dsn: env.SENTRY_DSN || '',
-		environment: 'beta',
-		release: 'metamorfit-worker-beta@1.0.0',
+		environment: 'alpha',
+		release: 'metamorfit-worker-alpha@1.0.0',
 		// Sample 100% of errors; reduce tracesSampleRate in production
 		tracesSampleRate: 1.0,
 		// Only initialize if DSN is set — allows graceful degradation without Sentry

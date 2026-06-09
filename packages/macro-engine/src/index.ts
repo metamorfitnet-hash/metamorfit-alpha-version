@@ -15,7 +15,7 @@ const app = new Hono<{ Bindings: {
 } }>();
 
 app.use('*', cors({
-  origin: ['https://beta.metamorfit.pro', 'https://metamorfit.pro', 'https://www.metamorfit.pro', 'http://localhost:3000'],
+  origin: ['https://metamorfit.online', 'http://localhost:3000'],
   allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowHeaders: ['Content-Type', 'Authorization', 'x-signature', 'x-timestamp'],
   maxAge: 86400,

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import './DailyTargetsPanel.css';
 
 interface MacroData {
@@ -19,7 +20,7 @@ interface DailyTargetsPanelProps {
   isLoading?: boolean;
 }
 
-const MacroGauge = ({ label, data }: { label: string; data: MacroData }) => {
+const MacroGauge = ({ label, data, isEs }: { label: string; data: MacroData; isEs: boolean }) => {
   const radius = 60;
   const circumference = 2 * Math.PI * radius;
   const consumedRatio = Math.min(data.consumed / data.target, 1);
@@ -69,18 +70,18 @@ const MacroGauge = ({ label, data }: { label: string; data: MacroData }) => {
             {Math.round(data.consumed)}g
           </text>
           <text x="74" y="86" textAnchor="middle" className="gauge-consumed-label">
-            CONSUMED
+            {isEs ? "CONSUMIDO" : "CONSUMED"}
           </text>
         </svg>
       </div>
 
       <div className="data-cell-block">
         <div className="data-cell">
-          <div className="cell-label">TARGET</div>
+          <div className="cell-label">{isEs ? "OBJETIVO" : "TARGET"}</div>
           <div className="cell-value target">{Math.round(data.target)}g</div>
         </div>
         <div className="data-cell">
-          <div className="cell-label">LEFT</div>
+          <div className="cell-label">{isEs ? "RESTANTE" : "LEFT"}</div>
           <div className={`cell-value ${isOver ? 'over' : 'left'}`}>
             {Math.round(data.target - data.consumed)}g
           </div>
@@ -96,6 +97,9 @@ export const DailyTargetsPanel: React.FC<DailyTargetsPanelProps> = ({
   macros,
   isLoading = false,
 }) => {
+  const { i18n } = useTranslation();
+  const isEs = i18n.language === 'es';
+
   const remaining = calorieTarget - caloriesConsumed;
   const isOver = remaining < 0;
   const fillWidth = Math.min((caloriesConsumed / calorieTarget) * 100, 100);
@@ -111,7 +115,7 @@ export const DailyTargetsPanel: React.FC<DailyTargetsPanelProps> = ({
     return (
       <div className="daily-targets-panel loading">
         {/* Skeleton UI could be added here */}
-        <div className="text-center text-mm-gold">Loading Metabolism Data...</div>
+        <div className="text-center text-mm-gold">{isEs ? "Cargando Datos de Metabolismo..." : "Loading Metabolism Data..."}</div>
       </div>
     );
   }
@@ -120,24 +124,24 @@ export const DailyTargetsPanel: React.FC<DailyTargetsPanelProps> = ({
     <div className="daily-targets-panel">
       {/* Section 1 — Title Block */}
       <div className="title-block">
-        <h2 className="panel-title">DAILY TARGETS</h2>
+        <h2 className="panel-title">{isEs ? "OBJETIVOS DIARIOS" : "DAILY TARGETS"}</h2>
         <div className="hero-calorie-row">
           <span className="hero-calorie-number">{Math.round(calorieTarget)}</span>
-          <span className="calorie-unit">KCAL / DAY</span>
+          <span className="calorie-unit">{isEs ? "KCAL / DÍA" : "KCAL / DAY"}</span>
         </div>
       </div>
 
       {/* Section 2 — Calorie Progress Bar */}
       <div className="calorie-progress-section">
         <div className="calorie-bar-header">
-          <div className="calorie-bar-label">TOTAL CALORIES</div>
+          <div className="calorie-bar-label">{isEs ? "CALORÍAS TOTALES" : "TOTAL CALORIES"}</div>
           <div className="calorie-bar-data">
-            <span className="data-item">{Math.round(caloriesConsumed)} consumed</span>
+            <span className="data-item">{Math.round(caloriesConsumed)} {isEs ? "consumidas" : "consumed"}</span>
             <span className="data-divider">·</span>
-            <span className="data-item">{Math.round(calorieTarget)} target</span>
+            <span className="data-item">{Math.round(calorieTarget)} {isEs ? "objetivo" : "target"}</span>
             <span className="data-divider">·</span>
             <span className={`data-item ${isOver ? 'over' : 'remaining'}`}>
-              {Math.round(remaining)} remaining
+              {Math.round(remaining)} {isEs ? "restantes" : "remaining"}
             </span>
           </div>
         </div>
@@ -153,15 +157,15 @@ export const DailyTargetsPanel: React.FC<DailyTargetsPanelProps> = ({
 
       {/* Section 3 — Macro Gauges */}
       <div className="macro-gauges-grid">
-        <MacroGauge label="PROTEIN" data={macros.protein} />
-        <MacroGauge label="CARBOHYDRATES" data={macros.carbs} />
-        <MacroGauge label="DIETARY FATS" data={macros.fats} />
+        <MacroGauge label={isEs ? "PROTEÍNA" : "PROTEIN"} data={macros.protein} isEs={isEs} />
+        <MacroGauge label={isEs ? "CARBOHIDRATOS" : "CARBOHYDRATES"} data={macros.carbs} isEs={isEs} />
+        <MacroGauge label={isEs ? "GRASAS" : "DIETARY FATS"} data={macros.fats} isEs={isEs} />
       </div>
 
       {/* Section 4 — Footer Line */}
       <div className="footer-line-section">
         <div className="footer-hairline" />
-        <p className="footer-tagline">Precision is the foundation of mastery. Align your intake with your biology.</p>
+        <p className="footer-tagline">{isEs ? "La precisión es la base de la maestría. Alinea tu ingesta con tu biología." : "Precision is the foundation of mastery. Align your intake with your biology."}</p>
         <div className="footer-hairline" />
       </div>
     </div>

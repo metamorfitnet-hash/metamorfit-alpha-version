@@ -1,11 +1,11 @@
 import type { NextConfig } from "next";
 
-const BETA_WORKER_URL = "https://metamorfit-worker-beta.metamorfitnet.workers.dev";
+const ALPHA_WORKER_URL = "https://metamorfit-worker-alpha.metamorfitnet.workers.dev";
 
 const nextConfig: NextConfig = {
   env: {
-    NEXT_PUBLIC_WORKER_URL: BETA_WORKER_URL,
-    WORKER_URL: BETA_WORKER_URL,
+    NEXT_PUBLIC_WORKER_URL: ALPHA_WORKER_URL,
+    WORKER_URL: ALPHA_WORKER_URL,
   },
   async redirects() {
     return [
@@ -80,7 +80,7 @@ const nextConfig: NextConfig = {
   // /api/status/:jobId → Worker's KV-backed job status endpoint (GET, no auth)
   // /api/download/:jobId → Worker's R2 PDF download endpoint (GET, no auth)
   async rewrites() {
-    const WORKER_URL = process.env.WORKER_URL || BETA_WORKER_URL;
+    const WORKER_URL = process.env.WORKER_URL || ALPHA_WORKER_URL;
     return [
       // Generic catch-all proxy for any Worker path
       // Example: /worker/api/status/abc → ${WORKER_URL}/api/status/abc

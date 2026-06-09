@@ -17,25 +17,32 @@ export interface ExplanationInput {
     tdee?: number;
   };
   personalizationScore?: number;
+  locale?: string;
 }
 
-export function getSystemPrompt(): string {
+export function getSystemPrompt(locale?: string): string {
+  const isEs = locale === 'es';
+  const strategyHeader = isEs ? 'ESTRATEGIA' : 'STRATEGY';
+  const fuelHeader = isEs ? 'MATRIZ DE COMBUSTIBLE' : 'FUEL MATRIX';
+  const edgeHeader = isEs ? 'CONSEJO CLAVE' : 'EDGE TIP';
+
   return `You are the AI Insight Analyst for Metamorfit. Your job is to deliver clinical, high-density metabolic insights based on user biometrics and goals. 
 
 Strictly adhere to the following formatting rules:
 - Provide exactly three short paragraphs.
 - Every single response must use this exact structure, starting each paragraph with these specific headers:
   
-STRATEGY: [Your first paragraph here explaining the overriding rationale behind the protein targets and macronutrient split based on their chosen persona/goal]
+${strategyHeader}: [Your first paragraph here explaining the overriding rationale behind the protein targets and macronutrient split based on their chosen persona/goal]
 
-FUEL MATRIX: [Your second paragraph here detailing the fuel synergy required for their specific body type/somatotype and how their metabolism handles macro distribution]
+${fuelHeader}: [Your second paragraph here detailing the fuel synergy required for their specific body type/somatotype and how their metabolism handles macro distribution]
 
-EDGE TIP: [Your third paragraph here giving a highly actionable, high-impact piece of timing or behavioral advice based on their activity profile]
+${edgeHeader}: [Your third paragraph here giving a highly actionable, high-impact piece of timing or behavioral advice based on their activity profile]
 
 - Do not use any subheadings, bullet points, or markdown lists.
 - Do not include conversational fluff, greetings, or conclusions (e.g., "I hope this helps!").
 - Insert exactly double line breaks (\\n\\n) between the three sections to ensure proper rendering on the frontend and PDF output modules.
-- Reference the calculated biometric values natively as context, but do not recalculate them or change the baseline numbers. Keep the tone authoritative, concise, and scientifically precise.`;
+- Reference the calculated biometric values natively as context, but do not recalculate them or change the baseline numbers. Keep the tone authoritative, concise, and scientifically precise.
+${isEs ? '\nCRITICAL: Write your response ENTIRELY in Spanish (Neutral/Castilian). Use the Spanish headers exactly as shown above.' : ''}`;
 }
 
 export function getUserPrompt(data: ExplanationInput): string {
@@ -46,7 +53,7 @@ Personalization Score: ${data.personalizationScore}`;
 }
 
 export async function getAiExplanation(env: any, data: ExplanationInput): Promise<{ explanation: string; latencyMs: number }> {
-  const systemPrompt = getSystemPrompt();
+  const systemPrompt = getSystemPrompt(data.locale);
   const userPrompt = getUserPrompt(data);
   const startTime = Date.now();
   

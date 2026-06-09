@@ -17,16 +17,21 @@ export interface ExplanationInput {
     tdee?: number;
   };
   personalizationScore?: number;
+  locale?: string;
 }
 
-export function getSystemPrompt(): string {
+export function getSystemPrompt(locale?: string): string {
+  const languageRule = locale === 'es'
+    ? '\nCRITICAL REQUIREMENT: You MUST write the JSON string values (the three paragraphs) ENTIRELY in Spanish (Neutral/Castilian). However, keep the exact English JSON keys "strategy", "fuelMatrix", and "edgeTip".'
+    : '';
+
   return `You are the AI Insight Analyst for Metamorfit. Your job is to deliver clinical, high-density metabolic insights based on user biometrics and goals. 
 
 Strictly adhere to the following formatting rules:
 - Provide exactly three short paragraphs.
 - Do not use any subheadings, bullet points, or markdown lists.
 - Do not include conversational fluff, greetings, or conclusions.
-- Reference the calculated biometric values natively as context, but do not recalculate them or change the baseline numbers. Keep the tone authoritative, concise, and scientifically precise.
+- Reference the calculated biometric values natively as context, but do not recalculate them or change the baseline numbers. Keep the tone authoritative, concise, and scientifically precise.${languageRule}
 
 You MUST output ONLY a valid JSON object matching this schema:
 {
@@ -44,7 +49,7 @@ Personalization Score: ${data.personalizationScore}`;
 }
 
 export async function getAiExplanation(env: any, data: ExplanationInput): Promise<{ explanation: string; latencyMs: number }> {
-  const systemPrompt = getSystemPrompt();
+  const systemPrompt = getSystemPrompt(data.locale);
   const userPrompt = getUserPrompt(data);
   const startTime = Date.now();
   
@@ -74,11 +79,13 @@ export async function getAiExplanation(env: any, data: ExplanationInput): Promis
     let explanation = "";
     
     if (parsed.strategy && parsed.fuelMatrix && parsed.edgeTip) {
-      explanation = `STRATEGY: ${parsed.strategy}\n\nFUEL MATRIX: ${parsed.fuelMatrix}\n\nEDGE TIP: ${parsed.edgeTip}`;
+      const isEs = data.locale === 'es';
+      explanation = `${isEs ? 'ESTRATEGIA' : 'STRATEGY'}: ${parsed.strategy}\n\n${isEs ? 'MATRIZ DE COMBUSTIBLE' : 'FUEL MATRIX'}: ${parsed.fuelMatrix}\n\n${isEs ? 'CONSEJO CLAVE' : 'EDGE TIP'}: ${parsed.edgeTip}`;
     } else {
       const values = Object.values(parsed);
       if (values.length >= 3) {
-        explanation = `STRATEGY: ${values[0]}\n\nFUEL MATRIX: ${values[1]}\n\nEDGE TIP: ${values[2]}`;
+        const isEs = data.locale === 'es';
+        explanation = `${isEs ? 'ESTRATEGIA' : 'STRATEGY'}: ${values[0]}\n\n${isEs ? 'MATRIZ DE COMBUSTIBLE' : 'FUEL MATRIX'}: ${values[1]}\n\n${isEs ? 'CONSEJO CLAVE' : 'EDGE TIP'}: ${values[2]}`;
       } else {
         throw new Error("Invalid AI JSON schema");
       }

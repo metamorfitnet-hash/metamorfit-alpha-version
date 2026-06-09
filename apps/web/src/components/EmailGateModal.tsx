@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslation } from "react-i18next";
 
 interface Ingredient {
   id: string;
@@ -53,23 +54,25 @@ type FormStatus = "idle" | "loading" | "success" | "error";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
-function validate(fullName: string, email: string): { fullName?: string; email?: string } {
+function validate(fullName: string, email: string, isEs: boolean): { fullName?: string; email?: string } {
   const errors: { fullName?: string; email?: string } = {};
-  if (!fullName.trim()) errors.fullName = "Full name is required.";
-  if (!email.trim()) errors.email = "Email address is required.";
-  else if (!EMAIL_REGEX.test(email)) errors.email = "Please enter a valid email address.";
+  if (!fullName.trim()) errors.fullName = isEs ? "El nombre completo es obligatorio." : "Full name is required.";
+  if (!email.trim()) errors.email = isEs ? "El correo electrónico es obligatorio." : "Email address is required.";
+  else if (!EMAIL_REGEX.test(email)) errors.email = isEs ? "Por favor, introduce un correo electrónico válido." : "Please enter a valid email address.";
   return errors;
 }
 
 export default function EmailGateModal({ onClose, mealPlan, calculatorInput }: EmailGateModalProps) {
   const router = useRouter();
+  const { i18n } = useTranslation();
+  const isEs = i18n.language === 'es';
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [touched, setTouched] = useState({ fullName: false, email: false });
   const [status, setStatus] = useState<FormStatus>("idle");
   const [serverError, setServerError] = useState("");
 
-  const errors = validate(fullName, email);
+  const errors = validate(fullName, email, isEs);
   const isValid = Object.keys(errors).length === 0;
 
   // Lock body scroll
@@ -101,6 +104,7 @@ export default function EmailGateModal({ onClose, mealPlan, calculatorInput }: E
         userId: localStorage.getItem('mm_uid') || undefined,
         email,
         fullName,
+        locale: isEs ? 'es' : 'en',
         tags: ["meal-planner"],
         identity: {
           name: fullName,
@@ -170,7 +174,7 @@ export default function EmailGateModal({ onClose, mealPlan, calculatorInput }: E
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || "Failed to send PDF.");
+        throw new Error(data.error || (isEs ? "Fallo al enviar el PDF." : "Failed to send PDF."));
       }
 
       setStatus("success");
@@ -182,7 +186,7 @@ export default function EmailGateModal({ onClose, mealPlan, calculatorInput }: E
     } catch (err: any) {
       console.error("[EmailGateModal] Submission error:", err);
       setStatus("error");
-      setServerError(err.message || "An unexpected error occurred. Please try again.");
+      setServerError(err.message || (isEs ? "Ocurrió un error inesperado. Por favor, inténtalo de nuevo." : "An unexpected error occurred. Please try again."));
     }
   };
 
@@ -215,10 +219,10 @@ export default function EmailGateModal({ onClose, mealPlan, calculatorInput }: E
               id="modal-title"
               className="mb-2 font-heading text-[24px] sm:text-[28px] tracking-[1px] text-mm-bone text-center uppercase"
             >
-              Get Your Personalized PDF Plan
+              {isEs ? "Obtén tu Plan en PDF Personalizado" : "Get Your Personalized PDF Plan"}
             </h2>
             <p className="mb-6 text-[14px] font-body text-mm-bone/75 text-center max-w-[320px] mx-auto">
-              Enter your details and we'll send your custom plan straight to your inbox.
+              {isEs ? "Introduce tus datos y te enviaremos tu plan personalizado directamente a tu bandeja de entrada." : "Enter your details and we'll send your custom plan straight to your inbox."}
             </p>
 
             {/* Server error banner */}
@@ -242,12 +246,12 @@ export default function EmailGateModal({ onClose, mealPlan, calculatorInput }: E
                   htmlFor="gate-name"
                   className="mb-1.5 block text-[12px] font-body uppercase tracking-widest text-mm-bone/75"
                 >
-                  Full Name
+                  {isEs ? "Nombre Completo" : "Full Name"}
                 </label>
                 <input
                   id="gate-name"
                   type="text"
-                  placeholder="e.g. Alex Torres"
+                  placeholder={isEs ? "Ej. Alex Torres" : "e.g. Alex Torres"}
                   autoComplete="name"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
@@ -271,12 +275,12 @@ export default function EmailGateModal({ onClose, mealPlan, calculatorInput }: E
                   htmlFor="gate-email"
                   className="mb-1.5 block text-[12px] font-body uppercase tracking-widest text-mm-bone/75"
                 >
-                  Email Address
+                  {isEs ? "Correo Electrónico" : "Email Address"}
                 </label>
                 <input
                   id="gate-email"
                   type="email"
-                  placeholder="you@example.com"
+                  placeholder={isEs ? "tu@ejemplo.com" : "you@example.com"}
                   autoComplete="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -305,14 +309,14 @@ export default function EmailGateModal({ onClose, mealPlan, calculatorInput }: E
                   {status === "loading" ? (
                     <>
                       <span className="h-4 w-4 animate-spin rounded-full border-2 border-mm-black/25 border-t-mm-black" />
-                      Sending...
+                      {isEs ? "Enviando..." : "Sending..."}
                     </>
                   ) : status === "success" ? (
                     <>
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                         <polyline points="20 6 9 17 4 12"></polyline>
                       </svg>
-                      Plan Sent!
+                      {isEs ? "¡Plan Enviado!" : "Plan Sent!"}
                     </>
                   ) : (
                     <>
@@ -320,7 +324,7 @@ export default function EmailGateModal({ onClose, mealPlan, calculatorInput }: E
                         <line x1="22" y1="2" x2="11" y2="13"></line>
                         <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
                       </svg>
-                      Send My Plan
+                      {isEs ? "Enviar Mi Plan" : "Send My Plan"}
                     </>
                   )}
                 </button>
@@ -328,7 +332,7 @@ export default function EmailGateModal({ onClose, mealPlan, calculatorInput }: E
 
               {/* Footer Note */}
               <p className="mt-3 text-center font-body text-[12px] text-[#A3A3A3]">
-                Free delivery · No spam, ever.
+                {isEs ? "Envío gratis · Sin spam, nunca." : "Free delivery · No spam, ever."}
               </p>
             </div>
           </div>

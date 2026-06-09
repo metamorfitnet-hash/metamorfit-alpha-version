@@ -1,7 +1,7 @@
 import { callWorkerForPdf } from './apps/web/src/lib/worker';
 
-process.env.WORKER_URL = "https://metamorfit-worker-beta.metamorfitnet.workers.dev";
-process.env.HMAC_SECRET = "meta_beta_sec_994a8f9c2d1b73e_74561_xyz";
+process.env.WORKER_URL = "https://metamorfit-worker-alpha.metamorfitnet.workers.dev";
+process.env.HMAC_SECRET = "meta_alpha_sec_a7c2e9f1b3d8k9m_42891_abc";
 
 const payload = {
   fullName: "Test User",

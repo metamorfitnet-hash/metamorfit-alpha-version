@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
 // server-side (never exposed to the browser).
 export const runtime = "edge";
 
-const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_A_URL || "https://metamorfit-worker-beta.metamorfitnet.workers.dev";
+const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_A_URL || "https://metamorfit-worker-alpha.metamorfitnet.workers.dev";
 
 export async function POST(req: NextRequest) {
   try {

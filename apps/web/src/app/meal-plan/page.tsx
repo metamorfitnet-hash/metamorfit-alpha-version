@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import EmailGateModal from "@/components/EmailGateModal";
 import { Header } from "@/components/Header";
 import { DailyTargetsPanel } from "@/components/DailyTargetsPanel";
 import { useOnboardingSession } from "@/hooks/useOnboardingSession";
+import { useTranslation } from "react-i18next";
 
 interface Ingredient {
   id: string;
@@ -24,14 +25,17 @@ interface MealSlot {
 }
 
 export default function MealPlanPage() {
+  const { t, i18n } = useTranslation();
+  const isEs = i18n.language === 'es';
+
   const [meals, setMeals] = useState<MealSlot[]>([
     { 
       id: "breakfast", 
       name: "Breakfast", 
       percentage: 25,
       ingredients: [
-        { id: "1", name: "3 large cage-free eggs, scrambled", calories: 210, protein: 18, carbs: 1.5, fats: 15 },
-        { id: "2", name: "40g steel cut oats with half a cup of blueberries", calories: 150, protein: 5, carbs: 27, fats: 2.5 }
+        { id: "1", name: isEs ? "3 huevos enteros grandes, revueltos" : "3 large cage-free eggs, scrambled", calories: 210, protein: 18, carbs: 1.5, fats: 15 },
+        { id: "2", name: isEs ? "40g de avena con media taza de arándanos" : "40g steel cut oats with half a cup of blueberries", calories: 150, protein: 5, carbs: 27, fats: 2.5 }
       ] 
     },
     { id: "lunch", name: "Lunch", percentage: 30, ingredients: [] },
@@ -39,6 +43,27 @@ export default function MealPlanPage() {
     { id: "snack1", name: "Protein Smoothie", percentage: 10, ingredients: [] },
     { id: "snack2", name: "SNACK", percentage: 5, ingredients: [] },
   ]);
+
+  // Sync default ingredients names when language changes so that they show up correctly in the UI and PDF
+  useEffect(() => {
+    setMeals(prev => prev.map(meal => {
+      if (meal.id === "breakfast") {
+        return {
+          ...meal,
+          ingredients: meal.ingredients.map(ing => {
+            if (ing.id === "1") {
+              return { ...ing, name: isEs ? "3 huevos enteros grandes, revueltos" : "3 large cage-free eggs, scrambled" };
+            }
+            if (ing.id === "2") {
+              return { ...ing, name: isEs ? "40g de avena con media taza de arándanos" : "40g steel cut oats with half a cup of blueberries" };
+            }
+            return ing;
+          })
+        };
+      }
+      return meal;
+    }));
+  }, [isEs]);
 
   const [showSnack2, setShowSnack2] = useState(false);
 
@@ -74,16 +99,16 @@ export default function MealPlanPage() {
         <div className="mt-24 flex flex-col items-center gap-4">
           <span className="text-5xl">⚡</span>
           <h2 className="text-3xl font-heading tracking-widest uppercase text-mm-bone">
-            Engine Not Calibrated
+            {isEs ? "Motor No Calibrado" : "Engine Not Calibrated"}
           </h2>
           <p className="text-mm-bone/50 font-body text-lg max-w-md leading-relaxed">
-            Please calibrate your metabolic engine first to generate a personalized meal plan.
+            {isEs ? "Por favor, calibra tu motor metabólico primero para generar un plan de comidas personalizado." : "Please calibrate your metabolic engine first to generate a personalized meal plan."}
           </p>
           <button
             onClick={() => router.push('/calculator')}
             className="mt-4 px-10 py-4 bg-mm-gold text-mm-black font-heading tracking-[0.3em] uppercase text-sm rounded-xl hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(201,168,76,0.4)] transition-all duration-300"
           >
-            Calibrate Metabolic Engine →
+            {isEs ? "Calibrar Motor Metabólico →" : "Calibrate Metabolic Engine →"}
           </button>
         </div>
       </div>
@@ -145,7 +170,8 @@ export default function MealPlanPage() {
       closeModal();
     } catch (err: any) {
       console.error(err);
-      setEstimateError(err.message || "Failed to estimate macros. Please try again.");
+      const errorMessage = isEs ? "Fallo al estimar los macros. Por favor, inténtalo de nuevo." : "Failed to estimate macros. Please try again.";
+      setEstimateError(err.message || errorMessage);
     } finally {
       setIsEstimating(false);
     }
@@ -195,8 +221,20 @@ export default function MealPlanPage() {
     .reduce((sum, m) => sum + m.percentage, 0);
   const allocationWarning =
     totalAllocated !== 100
-      ? `Note: Current allocation is ${totalAllocated}% of your daily target.`
+      ? (isEs ? `Nota: La asignación actual es el ${totalAllocated}% de tu objetivo diario.` : `Note: Current allocation is ${totalAllocated}% of your daily target.`)
       : null;
+
+  const getLocalizedMealName = (id: string, defaultName: string) => {
+    if (!isEs) return defaultName;
+    switch (id) {
+      case 'breakfast': return 'Desayuno';
+      case 'lunch': return 'Almuerzo';
+      case 'dinner': return 'Cena';
+      case 'snack1': return 'Batido de Proteína';
+      case 'snack2': return 'Snack';
+      default: return defaultName;
+    }
+  };
 
 
   return (
@@ -208,8 +246,8 @@ export default function MealPlanPage() {
 
         {/* ── PAGE HERO ── */}
         <header className="animate-slideUp mb-4">
-          <h1 className="text-6xl md:text-7xl font-heading tracking-tight mb-5 uppercase">Build Your <span className="text-mm-gold">Daily Meal Plan.</span></h1>
-          <p className="text-[17px] text-mm-bone/60 max-w-2xl font-body leading-loose">Design a full day of precision-targeted meals that matches your macro objectives.</p>
+          <h1 className="text-6xl md:text-7xl font-heading tracking-tight mb-5 uppercase">{isEs ? "Construye tu" : "Build Your"} <span className="text-mm-gold">{isEs ? "Plan de Comidas Diario." : "Daily Meal Plan."}</span></h1>
+          <p className="text-[17px] text-mm-bone/60 max-w-2xl font-body leading-loose">{isEs ? "Diseña un día completo de comidas dirigidas con precisión que se ajusten a tus objetivos macro." : "Design a full day of precision-targeted meals that matches your macro objectives."}</p>
         </header>
 
         {/* ── DAILY TARGETS DASHBOARD ── */}
@@ -232,12 +270,13 @@ export default function MealPlanPage() {
               .map((meal) => {
               const index = meals.indexOf(meal);
               const isSnack1 = meal.id === "snack1";
-              const snack1Prefill = "25g whey protein shake with 250ml almond milk and a banana";
+              const snack1Prefill = isEs ? "Batido de proteína de suero de 25g con 250ml de leche de almendras y un plátano" : "25g whey protein shake with 250ml almond milk and a banana";
               return (
                 <MealSlotCard 
                   key={meal.id} 
-                  meal={meal} 
+                  meal={{...meal, name: getLocalizedMealName(meal.id, meal.name)}} 
                   targets={targets}
+                  isEs={isEs}
                   onPercentageChange={(newPercentage) => {
                     const updatedMeals = [...meals];
                     updatedMeals[index] = { ...updatedMeals[index], percentage: newPercentage };
@@ -264,7 +303,7 @@ export default function MealPlanPage() {
                 onClick={() => setShowSnack2(true)}
                 className="w-full md:w-auto px-10 py-4 font-heading tracking-[0.3em] uppercase text-sm border border-white/10 rounded-xl text-mm-bone/50 hover:border-mm-gold/40 hover:text-mm-gold transition-all duration-300"
               >
-                + Add Meal
+                {isEs ? "+ Añadir Comida" : "+ Add Meal"}
               </button>
             </div>
           )}
@@ -297,21 +336,21 @@ export default function MealPlanPage() {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                   </svg>
-                  Finalizing...
+                  {isEs ? "Finalizando..." : "Finalizing..."}
                 </span>
               ) : (
                 <>
-                  Generate My Plan →
+                  {isEs ? "Generar Mi Plan →" : "Generate My Plan →"}
                   {!hasItems && (
                     <div className="absolute inset-0 bg-mm-gold/5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                      <span className="text-sm font-body tracking-widest lowercase italic text-mm-gold">Add food items to proceed</span>
+                      <span className="text-sm font-body tracking-widest lowercase italic text-mm-gold">{isEs ? "Añade alimentos para proceder" : "Add food items to proceed"}</span>
                     </div>
                   )}
                 </>
               )}
             </button>
 
-            {!hasItems && <p className="text-mm-bone/30 font-body text-sm tracking-widest uppercase">Add meals above to unlock</p>}
+            {!hasItems && <p className="text-mm-bone/30 font-body text-sm tracking-widest uppercase">{isEs ? "Añade comidas arriba para desbloquear" : "Add meals above to unlock"}</p>}
           </div>
         </div>
       </main>
@@ -327,10 +366,10 @@ export default function MealPlanPage() {
             </button>
             
             <h2 className="text-2xl md:text-3xl font-heading tracking-widest uppercase mb-3 text-mm-bone">
-              Describe your <span className="text-mm-gold">Meal</span>
+              {isEs ? "Describe tu" : "Describe your"} <span className="text-mm-gold">{isEs ? "Comida" : "Meal"}</span>
             </h2>
             <p className="text-mm-bone/60 font-body text-sm mb-6 leading-relaxed max-w-sm">
-              Precision requires truth. Tell our AI exactly what you plan to consume, and we will analyze the macronutrient profile instantly.
+              {isEs ? "La precisión requiere verdad. Dile a nuestra IA exactamente qué planeas consumir y analizaremos el perfil de macronutrientes al instante." : "Precision requires truth. Tell our AI exactly what you plan to consume, and we will analyze the macronutrient profile instantly."}
             </p>
             
             {estimateError && (
@@ -345,7 +384,7 @@ export default function MealPlanPage() {
             <textarea 
               value={mealDescription}
               onChange={(e) => setMealDescription(e.target.value)}
-              placeholder="Example: 3 whole eggs scrambled, a bowl of oatmeal with a handful of blueberries, and black coffee"
+              placeholder={isEs ? "Ejemplo: 3 huevos enteros revueltos, un tazón de avena con un puñado de arándanos y café negro" : "Example: 3 whole eggs scrambled, a bowl of oatmeal with a handful of blueberries, and black coffee"}
               className="w-full h-32 bg-mm-black/50 border border-white/[0.08] rounded-xl p-4 mb-6 text-sm text-mm-bone font-body leading-loose outline-none focus:border-mm-gold/40 focus:bg-mm-black/80 focus:shadow-[0_0_15px_rgba(201,168,76,0.1)] transition-all resize-none shadow-inner"
               autoFocus
             />
@@ -355,7 +394,7 @@ export default function MealPlanPage() {
                 onClick={closeModal}
                 className="px-6 py-3 font-heading tracking-widest uppercase text-xs text-mm-bone/50 hover:text-mm-bone transition-colors"
               >
-                Cancel
+                {isEs ? "Cancelar" : "Cancel"}
               </button>
               <button 
                 disabled={!mealDescription.trim() || isEstimating}
@@ -372,10 +411,10 @@ export default function MealPlanPage() {
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    Analyzing...
+                    {isEs ? "Analizando..." : "Analyzing..."}
                   </>
                 ) : (
-                  "Estimate Macros →"
+                  isEs ? "Estimar Macros →" : "Estimate Macros →"
                 )}
               </button>
             </div>
@@ -444,13 +483,15 @@ function MealSlotCard({
   targets, 
   onPercentageChange,
   onAddFoods,
-  onRemoveIngredient
+  onRemoveIngredient,
+  isEs
 }: { 
   meal: MealSlot; 
   targets: any; 
   onPercentageChange: (val: number) => void;
   onAddFoods: () => void;
   onRemoveIngredient: (id: string) => void;
+  isEs: boolean;
 }) {
   const totals = meal.ingredients.reduce((acc, curr) => ({
     calories: acc.calories + curr.calories,
@@ -528,7 +569,7 @@ function MealSlotCard({
         {/* Totals + Add button */}
         <div className="flex flex-wrap items-center gap-10 w-full md:w-auto mt-4 md:mt-0 pt-6 md:pt-0 border-t md:border-t-0 border-white/[0.08]">
           <div className="flex flex-col items-end gap-2">
-            <span className="text-[11px] uppercase tracking-[0.15em] text-mm-bone/40 font-heading">Actual / Target</span>
+            <span className="text-[11px] uppercase tracking-[0.15em] text-mm-bone/40 font-heading">{isEs ? "Actual / Objetivo" : "Actual / Target"}</span>
             <div className="flex gap-6 items-baseline">
 
               {/* Calories */}
@@ -595,7 +636,7 @@ function MealSlotCard({
             className="w-full md:w-auto group/add px-11 py-4 md:py-5 bg-mm-gold border border-mm-gold rounded-2xl text-mm-black font-heading tracking-[0.25em] uppercase text-base relative overflow-hidden whitespace-nowrap flex items-center justify-center shadow-[0_0_20px_rgba(201,168,76,0.15)] transition-all duration-[400ms] [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-[3px] hover:shadow-[0_8px_40px_rgba(201,168,76,0.4)] hover:bg-[#e2be4a] active:scale-[0.96] active:translate-y-0 active:shadow-[0_2px_12px_rgba(201,168,76,0.2)]"
           >
             <span className="relative z-10 flex items-center gap-2.5 font-medium">
-              <span className="text-lg leading-none">+</span> Add Foods
+              <span className="text-lg leading-none">+</span> {isEs ? "Añadir Alimentos" : "Add Foods"}
             </span>
             {/* Shimmer sweep */}
             <span className="absolute inset-0 -translate-x-[110%] group-hover/add:translate-x-[110%] transition-transform duration-700 ease-out bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none" />
@@ -607,11 +648,11 @@ function MealSlotCard({
       <div className="space-y-4 pt-2">
         {meal.ingredients.length > 0 ? (
           meal.ingredients.map((ing) => (
-            <IngredientRow key={ing.id} ingredient={ing} onRemove={() => onRemoveIngredient(ing.id)} />
+            <IngredientRow key={ing.id} ingredient={ing} onRemove={() => onRemoveIngredient(ing.id)} isEs={isEs} />
           ))
         ) : (
           <div className="flex flex-col items-center justify-center py-12 rounded-[2rem] bg-mm-black/20 border border-dashed border-white/[0.08] text-mm-bone/20 font-body text-xs uppercase tracking-[0.3em]">
-             Awaiting Selection
+             {isEs ? "Esperando Selección" : "Awaiting Selection"}
           </div>
         )}
       </div>
@@ -619,14 +660,14 @@ function MealSlotCard({
   );
 }
 
-function IngredientRow({ ingredient, onRemove }: { ingredient: Ingredient, onRemove: () => void }) {
+function IngredientRow({ ingredient, onRemove, isEs }: { ingredient: Ingredient, onRemove: () => void, isEs: boolean }) {
   return (
     <div className="bg-mm-black/50 border border-white/[0.06] rounded-xl px-4 py-3 md:px-5 md:py-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 hover:bg-mm-black/80 hover:border-white/[0.1] shadow-sm transition-all duration-300 group/row animate-fadeIn">
       <div className="flex items-start gap-3 w-full md:w-auto">
         <div className="w-1.5 h-1.5 rounded-full bg-mm-gold/50 mt-[7px] group-hover/row:bg-mm-gold group-hover/row:shadow-[0_0_8px_rgba(201,168,76,0.6)] transition-all shrink-0" />
         <div className="flex-1">
           <p className="text-mm-bone/80 font-body text-sm leading-relaxed mb-1 max-w-lg">{ingredient.name}</p>
-          <span className="px-2 py-0.5 bg-mm-gold/5 text-mm-gold border border-mm-gold/20 rounded text-[9px] uppercase tracking-[0.1em] font-heading">AI-Estimated</span>
+          <span className="px-2 py-0.5 bg-mm-gold/5 text-mm-gold border border-mm-gold/20 rounded text-[9px] uppercase tracking-[0.1em] font-heading">{isEs ? "Estimado por IA" : "AI-Estimated"}</span>
         </div>
       </div>
 

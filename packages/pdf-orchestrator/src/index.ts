@@ -98,7 +98,7 @@ export default {
         await env.PDF_STORAGE.put(userId, pdfArrayBuffer, {
           httpMetadata: { contentType: "application/pdf" }
         });
-        pdfUrl = `https://metamorfit-worker-beta.metamorfitnet.workers.dev/api/download/${userId}`;
+        pdfUrl = `https://metamorfit-worker-alpha.metamorfitnet.workers.dev/api/download/${userId}`;
       }
 
       // 4. Email Delivery via Brevo

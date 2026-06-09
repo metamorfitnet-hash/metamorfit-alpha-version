@@ -72,7 +72,7 @@ export function useCalculator() {
     setErrors([]);
 
     try {
-      const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_A_URL || "https://metamorfit-worker-beta.metamorfitnet.workers.dev";
+      const WORKER_URL = process.env.NEXT_PUBLIC_WORKER_A_URL || "https://metamorfit-worker-alpha.metamorfitnet.workers.dev";
       const baseUrl = WORKER_URL.endsWith('/') ? WORKER_URL.slice(0, -1) : WORKER_URL;
 
       // Map frontend fields to Worker's expected schema
@@ -159,7 +159,7 @@ export function useCalculator() {
 
   async function finalizeSession(userId: string): Promise<MacroPayload | null> {
     try {
-      const workerUrl = process.env.NEXT_PUBLIC_WORKER_A_URL || 'https://metamorfit-worker-beta.metamorfitnet.workers.dev';
+      const workerUrl = process.env.NEXT_PUBLIC_WORKER_A_URL || 'https://metamorfit-worker-alpha.metamorfitnet.workers.dev';
       const baseUrl = (workerUrl.endsWith('/') ? workerUrl.slice(0, -1) : workerUrl) + '/api';
       
       const response = await fetch(`${baseUrl}/ledger/${userId}/finalize`, {

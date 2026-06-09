@@ -530,47 +530,52 @@ export const NoteCard = ({ title, text }: { title: string; text: string }) => {
 // §9. DailyTargets
 // — Calories, protein minimum, carbs/fats, water, steps
 // ============================================================
-export const DailyTargets = ({ metabolicProfile }: { metabolicProfile: MetabolicProfile }) => (
+export const DailyTargets = ({ metabolicProfile, locale = 'en' }: { metabolicProfile: MetabolicProfile; locale?: string }) => {
+  const isEs = locale === 'es';
+  return (
   <div style={{ display: 'flex', flexDirection: 'row', gap: SPACING.cellPadding, width: '100%' }}>
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <div style={{ display: 'flex', fontSize: TYPOGRAPHY.scale.label, fontWeight: 600, color: COLORS.boneMuted }}>DAILY CALORIES</div>
+      <div style={{ display: 'flex', fontSize: TYPOGRAPHY.scale.label, fontWeight: 600, color: COLORS.boneMuted }}>{isEs ? "CALORÍAS DIARIAS" : "DAILY CALORIES"}</div>
       <div style={{ display: 'flex', fontSize: TYPOGRAPHY.scale.h1, fontWeight: 600, color: COLORS.gold, fontFamily: TYPOGRAPHY.body }}>{`${metabolicProfile.targetKcal || metabolicProfile.tdee}`}</div>
-      <div style={{ display: 'flex', fontSize: TYPOGRAPHY.scale.label, color: COLORS.boneMuted }}>TARGET</div>
+      <div style={{ display: 'flex', fontSize: TYPOGRAPHY.scale.label, color: COLORS.boneMuted }}>{isEs ? "OBJETIVO" : "TARGET"}</div>
     </div>
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', borderLeft: `1px solid ${COLORS.divider || ""}`, borderRight: `1px solid ${COLORS.divider || ""}` }}>
-      <div style={{ display: 'flex', fontSize: TYPOGRAPHY.scale.label, fontWeight: 600, color: COLORS.boneMuted }}>PROTEIN MINIMUM</div>
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', borderLeft: `1px solid ${COLORS.divider}`, borderRight: `1px solid ${COLORS.divider}` }}>
+      <div style={{ display: 'flex', fontSize: TYPOGRAPHY.scale.label, fontWeight: 600, color: COLORS.boneMuted }}>{isEs ? "MÍNIMO PROTEÍNA" : "PROTEIN MINIMUM"}</div>
       <div style={{ display: 'flex', fontSize: TYPOGRAPHY.scale.h1, fontWeight: 600, color: COLORS.gold, fontFamily: TYPOGRAPHY.body }}>{`${metabolicProfile.proteinGrams || ""}G`}</div>
-      <div style={{ display: 'flex', fontSize: TYPOGRAPHY.scale.label, color: COLORS.boneMuted }}>HIT THIS FIRST</div>
+      <div style={{ display: 'flex', fontSize: TYPOGRAPHY.scale.label, color: COLORS.boneMuted }}>{isEs ? "ALCANZA ESTO PRIMERO" : "HIT THIS FIRST"}</div>
     </div>
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <div style={{ display: 'flex', fontSize: TYPOGRAPHY.scale.label, fontWeight: 600, color: COLORS.boneMuted }}>CARBS / FAT</div>
+      <div style={{ display: 'flex', fontSize: TYPOGRAPHY.scale.label, fontWeight: 600, color: COLORS.boneMuted }}>{isEs ? "CARBOHIDRATOS / GRASAS" : "CARBS / FAT"}</div>
       <div style={{ display: 'flex', fontSize: 20, fontWeight: 600, color: COLORS.gold, fontFamily: TYPOGRAPHY.body }}>{`${metabolicProfile.carbsGrams || ""}G / ${metabolicProfile.fatsGrams || ""}G`}</div>
-      <div style={{ display: 'flex', fontSize: TYPOGRAPHY.scale.label, color: COLORS.boneMuted }}>FUEL BALANCE</div>
+      <div style={{ display: 'flex', fontSize: TYPOGRAPHY.scale.label, color: COLORS.boneMuted }}>{isEs ? "BALANCE DE COMBUSTIBLE" : "FUEL BALANCE"}</div>
     </div>
   </div>
-);
+  );
+};
 
 // ============================================================
 // §10. MealTable — Compact ingredient layout
 // — 9.5pt font, 1.15 line-height, 4px cell padding
 // — Gold dividers, right-aligned macro columns
 // ============================================================
-export const MealTable = ({ meal, compact = false }: { meal: Meal; compact?: boolean }) => (
+export const MealTable = ({ meal, compact = false, locale = 'en' }: { meal: Meal; compact?: boolean; locale?: string }) => {
+  const isEs = locale === 'es';
+  return (
   <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
     {/* Table header */}
-    <div style={{ display: 'flex', flexDirection: 'row', borderBottom: `1px solid ${COLORS.goldDivider || ""}`, paddingBottom: SPACING.cellPaddingCompact, marginBottom: SPACING.cellPaddingCompact }}>
-      <div style={{ display: 'flex', flex: 5, fontSize: TYPOGRAPHY.scale.ingredient, fontWeight: 600, color: COLORS.gold, fontFamily: TYPOGRAPHY.heading }}>INGREDIENT</div>
+    <div style={{ display: 'flex', flexDirection: 'row', borderBottom: `1px solid ${COLORS.goldDivider}`, paddingBottom: SPACING.cellPaddingCompact, marginBottom: SPACING.cellPaddingCompact }}>
+      <div style={{ display: 'flex', flex: 5, fontSize: TYPOGRAPHY.scale.ingredient, fontWeight: 600, color: COLORS.gold, fontFamily: TYPOGRAPHY.heading }}>{isEs ? "INGREDIENTE" : "INGREDIENT"}</div>
       <div style={{ display: 'flex', width: 40, fontSize: TYPOGRAPHY.scale.ingredient, fontWeight: 600, color: COLORS.gold, fontFamily: TYPOGRAPHY.heading, justifyContent: 'flex-end' }}>P</div>
       <div style={{ display: 'flex', width: 40, fontSize: TYPOGRAPHY.scale.ingredient, fontWeight: 600, color: COLORS.gold, fontFamily: TYPOGRAPHY.heading, justifyContent: 'flex-end' }}>C</div>
-      <div style={{ display: 'flex', width: 40, fontSize: TYPOGRAPHY.scale.ingredient, fontWeight: 600, color: COLORS.gold, fontFamily: TYPOGRAPHY.heading, justifyContent: 'flex-end' }}>F</div>
+      <div style={{ display: 'flex', width: 40, fontSize: TYPOGRAPHY.scale.ingredient, fontWeight: 600, color: COLORS.gold, fontFamily: TYPOGRAPHY.heading, justifyContent: 'flex-end' }}>G</div>
       <div style={{ display: 'flex', width: 48, fontSize: TYPOGRAPHY.scale.ingredient, fontWeight: 600, color: COLORS.gold, fontFamily: TYPOGRAPHY.heading, justifyContent: 'flex-end' }}>KCAL</div>
     </div>
     {/* Table rows */}
     {(!meal.ingredients || meal.ingredients.length === 0) && (
-      <div style={{ display: 'flex', fontSize: TYPOGRAPHY.scale.ingredient, color: COLORS.boneMuted, fontStyle: 'italic', padding: `${SPACING.cellPaddingCompact || ""}px 0` }}>No primary ingredients listed.</div>
+      <div style={{ display: 'flex', fontSize: TYPOGRAPHY.scale.ingredient, color: COLORS.boneMuted, fontStyle: 'italic', padding: `${SPACING.cellPaddingCompact}px 0` }}>{isEs ? "No se listan ingredientes principales." : "No primary ingredients listed."}</div>
     )}
     {(meal.ingredients || []).map((ing, j) => (
-      <div key={j || ""} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', padding: compact ? '4px 0' : `${SPACING.cellPaddingCompact || ""}px 0`, borderBottom: j < (meal.ingredients?.length || 0) - 1 ? `1px solid ${COLORS.goldDivider || ""}` : 'none', width: '100%', lineHeight: compact ? 1.12 : TYPOGRAPHY.lineHeight.compact }}>
+      <div key={j || ""} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', padding: compact ? '4px 0' : `${SPACING.cellPaddingCompact}px 0`, borderBottom: j < (meal.ingredients?.length || 0) - 1 ? `1px solid ${COLORS.goldDivider}` : 'none', width: '100%', lineHeight: compact ? 1.12 : TYPOGRAPHY.lineHeight.compact }}>
         <div style={{ display: 'flex', flex: 5, flexDirection: 'column', overflow: 'hidden', flexShrink: 1 }}>
           <div style={{ display: 'flex', fontSize: TYPOGRAPHY.scale.ingredient, fontWeight: 500, color: COLORS.bone, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{ing.name || ""}</div>
           {(ing.amount || ing.unit) && (
@@ -584,7 +589,7 @@ export const MealTable = ({ meal, compact = false }: { meal: Meal; compact?: boo
       </div>
     ))}
     {/* Meal totals row */}
-    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', padding: `${SPACING.cellPaddingCompact || ""}px 0`, borderTop: `1px solid ${COLORS.goldDivider || ""}`, marginTop: 2, width: '100%' }}>
+    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', padding: `${SPACING.cellPaddingCompact}px 0`, borderTop: `1px solid ${COLORS.goldDivider}`, marginTop: 2, width: '100%' }}>
       <div style={{ display: 'flex', flex: 5, fontSize: TYPOGRAPHY.scale.ingredient, fontWeight: 600, color: COLORS.boneMuted, flexShrink: 1 }}>TOTAL</div>
       <div style={{ display: 'flex', width: 40, fontSize: TYPOGRAPHY.scale.ingredient, fontWeight: 600, color: COLORS.bone, justifyContent: 'flex-end', fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>{Math.round(meal.protein)}g</div>
       <div style={{ display: 'flex', width: 40, fontSize: TYPOGRAPHY.scale.ingredient, fontWeight: 600, color: COLORS.bone, justifyContent: 'flex-end', fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>{Math.round(meal.carbs)}g</div>
@@ -592,7 +597,8 @@ export const MealTable = ({ meal, compact = false }: { meal: Meal; compact?: boo
       <div style={{ display: 'flex', width: 48, fontSize: TYPOGRAPHY.scale.ingredient, fontWeight: 600, color: COLORS.gold, justifyContent: 'flex-end', fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>{Math.round(meal.calories)}</div>
     </div>
   </div>
-);
+  );
+};
 
 // ============================================================
 // §11. SectionTitle
@@ -674,38 +680,40 @@ export const Badge = ({ label, variant }: { label: string; variant: 'gold' | 'ch
 // Page Compositions — use extracted components, preserve data logic
 // ============================================================
 
-export const Page1 = ({ identity, personalization, totalPages = 3 }: { identity: Identity; personalization: Personalization; totalPages?: number }) => (
-  <PageWrapper pageNumber={1 || ""} totalPages={totalPages || ""}>
+export const Page1 = ({ identity, personalization, totalPages = 3, locale = 'en' }: { identity: Identity; personalization: Personalization; totalPages?: number; locale?: string }) => {
+  const isEs = locale === 'es';
+  return (
+  <PageWrapper pageNumber={1} totalPages={totalPages}>
     {/* Tier 1: Integrated Header */}
-    <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%', borderBottom: `1px solid ${COLORS.teal || ""}`, paddingBottom: SPACING.cellPadding, marginBottom: SPACING.block }}>
+    <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%', borderBottom: `1px solid ${COLORS.teal}`, paddingBottom: SPACING.cellPadding, marginBottom: SPACING.block }}>
       <div style={{ display: 'flex', flexDirection: 'column' }}>
         <div style={{ display: 'flex', fontSize: TYPOGRAPHY.scale.label, fontWeight: 700, color: COLORS.teal, letterSpacing: 1 }}>METAMORFIT</div>
         <div style={{ display: 'flex', fontSize: 32, fontWeight: 700, color: COLORS.bone }}>{(String(identity.name || "")).toUpperCase()}</div>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'center' }}>
-        <div style={{ display: 'flex', fontSize: TYPOGRAPHY.scale.label, color: COLORS.slate }}>GENERATED</div>
-        <div style={{ display: 'flex', fontSize: TYPOGRAPHY.scale.body, fontWeight: 500, color: COLORS.bone }}>{new Date().toLocaleDateString()}</div>
+        <div style={{ display: 'flex', fontSize: TYPOGRAPHY.scale.label, color: COLORS.slate }}>{isEs ? "GENERADO" : "GENERATED"}</div>
+        <div style={{ display: 'flex', fontSize: TYPOGRAPHY.scale.body, fontWeight: 500, color: COLORS.bone }}>{new Date().toLocaleDateString(isEs ? 'es-ES' : 'en-US')}</div>
       </div>
     </div>
 
     {/* Tier 2: Hero Metric Split */}
     <div style={{ display: 'flex', flexDirection: 'row', gap: SPACING.block, width: '100%', flex: 1, padding: `${SPACING.block || ""}px 0` }}>
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: COLORS.dark, padding: SPACING.cardPadding, borderRadius: 8, borderLeft: `4px solid ${COLORS.teal || ""}`, justifyContent: 'center' }}>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: COLORS.dark, padding: SPACING.cardPadding, borderRadius: 8, borderLeft: `4px solid ${COLORS.teal}`, justifyContent: 'center' }}>
         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 }}>
           {ICONS.flame(COLORS.teal)}
-          <div style={{ display: 'flex', fontSize: TYPOGRAPHY.scale.label, fontWeight: 700, color: COLORS.teal, letterSpacing: 1 }}>GOAL</div>
+          <div style={{ display: 'flex', fontSize: TYPOGRAPHY.scale.label, fontWeight: 700, color: COLORS.teal, letterSpacing: 1 }}>{isEs ? "OBJETIVO" : "GOAL"}</div>
         </div>
         <div style={{ display: 'flex', fontSize: 40, fontWeight: 700, color: COLORS.bone, lineHeight: 1 }}>{(String(identity.goal || "")).toUpperCase()}</div>
-        <div style={{ display: 'flex', fontSize: 12, fontWeight: 300, color: COLORS.slate, marginTop: 8 }}>Fat Loss & Muscle Preservation</div>
+        <div style={{ display: 'flex', fontSize: 12, fontWeight: 300, color: COLORS.slate, marginTop: 8 }}>{isEs ? "Pérdida de Grasa y Preservación Muscular" : "Fat Loss & Muscle Preservation"}</div>
       </div>
 
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: COLORS.dark, padding: SPACING.cardPadding, borderRadius: 8, borderLeft: `4px solid ${COLORS.amber || ""}`, justifyContent: 'center' }}>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: COLORS.dark, padding: SPACING.cardPadding, borderRadius: 8, borderLeft: `4px solid ${COLORS.amber}`, justifyContent: 'center' }}>
         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 }}>
           {ICONS.somatotype()}
-          <div style={{ display: 'flex', fontSize: TYPOGRAPHY.scale.label, fontWeight: 700, color: COLORS.amber, letterSpacing: 1 }}>TYPE</div>
+          <div style={{ display: 'flex', fontSize: TYPOGRAPHY.scale.label, fontWeight: 700, color: COLORS.amber, letterSpacing: 1 }}>{isEs ? "TIPO" : "TYPE"}</div>
         </div>
         <div style={{ display: 'flex', fontSize: 32, fontWeight: 700, color: COLORS.bone, lineHeight: 1 }}>{(String(identity.bodyType || "")).toUpperCase()}</div>
-        <div style={{ display: 'flex', fontSize: 12, fontWeight: 300, color: COLORS.slate, marginTop: 8 }}>{personalization.personalizationScore}% Physiology Match</div>
+        <div style={{ display: 'flex', fontSize: 12, fontWeight: 300, color: COLORS.slate, marginTop: 8 }}>{personalization.personalizationScore}% {isEs ? "Coincidencia Fisiológica" : "Physiology Match"}</div>
       </div>
     </div>
 
@@ -717,41 +725,43 @@ export const Page1 = ({ identity, personalization, totalPages = 3 }: { identity:
       <div style={{ display: 'flex', fontSize: TYPOGRAPHY.scale.h3, color: COLORS.slate }}>|</div>
       <div style={{ display: 'flex', fontSize: TYPOGRAPHY.scale.h3, fontWeight: 700, color: COLORS.bone }}>{`${identity.heightCm || '--'}cm`}</div>
       <div style={{ display: 'flex', fontSize: TYPOGRAPHY.scale.h3, color: COLORS.slate }}>|</div>
-      <div style={{ display: 'flex', fontSize: TYPOGRAPHY.scale.h3, fontWeight: 700, color: COLORS.bone }}>{`${identity.bodyFatPct || '--'}% BF`}</div>
+      <div style={{ display: 'flex', fontSize: TYPOGRAPHY.scale.h3, fontWeight: 700, color: COLORS.bone }}>{`${identity.bodyFatPct || '--'}% ${isEs ? "GC" : "BF"}`}</div>
     </div>
   </PageWrapper>
-);
+  );
+};
 
-export const Page2 = ({ identity, metabolicProfile, notes, totalPages = 3 }: { identity: Identity; metabolicProfile: MetabolicProfile; notes: IntelligenceNote[]; totalPages?: number }) => {
+export const Page2 = ({ identity, metabolicProfile, notes, totalPages = 3, locale = 'en' }: { identity: Identity; metabolicProfile: MetabolicProfile; notes: IntelligenceNote[]; totalPages?: number; locale?: string }) => {
+  const isEs = locale === 'es';
   const targetCal = metabolicProfile.targetKcal || metabolicProfile.tdee;
   const surplusVal = metabolicProfile.surplus || 0;
   const isDeficit = surplusVal < 0;
   const absSurplus = Math.abs(surplusVal);
-  const surplusLabel = isDeficit ? `${absSurplus || ""} CALORIE DEFICIT` : `${absSurplus || ""} SURPLUS`;
+  const surplusLabel = isDeficit ? `${absSurplus} ${isEs ? "DÉFICIT CALÓRICO" : "CALORIE DEFICIT"}` : `${absSurplus} ${isEs ? "SUPERÁVIT" : "SURPLUS"}`;
   const surplusColor = isDeficit ? COLORS.teal : COLORS.gold;
   const surplusIcon = isDeficit ? '↓' : '↑';
 
   return (
-    <PageWrapper pageNumber={2 || ""} totalPages={totalPages || ""} compact>
-      <PageHeader title="YOUR PERSONALIZED PLAN LOGIC" pageNumber={2 || ""} />
+    <PageWrapper pageNumber={2} totalPages={totalPages} compact>
+      <PageHeader title={isEs ? "LÓGICA DE TU PLAN PERSONALIZADO" : "YOUR PERSONALIZED PLAN LOGIC"} pageNumber={2} />
 
-      <Card headerTitle="YOUR ENERGY EQUATION" style={{ marginBottom: SPACING.blockCompact }}>
+      <Card headerTitle={isEs ? "TU ECUACIÓN DE ENERGÍA" : "YOUR ENERGY EQUATION"} style={{ marginBottom: SPACING.blockCompact }}>
         <div style={{ display: 'flex', flexDirection: 'row', gap: SPACING.cellPaddingCompact, width: '100%' }}>
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             {ICONS.flame()}
-            <div style={{ display: 'flex', fontSize: TYPOGRAPHY.scale.label, fontWeight: 600, color: COLORS.boneMuted, marginTop: 4 }}>BASE METABOLIC</div>
+            <div style={{ display: 'flex', fontSize: TYPOGRAPHY.scale.label, fontWeight: 600, color: COLORS.boneMuted, marginTop: 4 }}>{isEs ? "METABOLISMO BASAL" : "BASE METABOLIC"}</div>
             <div style={{ display: 'flex', fontSize: TYPOGRAPHY.scale.h2, fontWeight: 600, color: COLORS.gold, fontFamily: TYPOGRAPHY.body }}>{`${metabolicProfile.bmr || 1850}`}</div>
-            <div style={{ display: 'flex', fontSize: TYPOGRAPHY.scale.label, color: COLORS.boneMuted }}>KCAL / BMR</div>
+            <div style={{ display: 'flex', fontSize: TYPOGRAPHY.scale.label, color: COLORS.boneMuted }}>KCAL / {isEs ? "TMB" : "BMR"}</div>
           </div>
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', borderLeft: `1px solid ${COLORS.goldDivider || ""}`, borderRight: `1px solid ${COLORS.goldDivider || ""}` }}>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', borderLeft: `1px solid ${COLORS.goldDivider}`, borderRight: `1px solid ${COLORS.goldDivider}` }}>
             {ICONS.flame(COLORS.gold)}
-            <div style={{ display: 'flex', fontSize: TYPOGRAPHY.scale.label, fontWeight: 600, color: COLORS.boneMuted, marginTop: 4 }}>TOTAL DAILY ENERGY</div>
+            <div style={{ display: 'flex', fontSize: TYPOGRAPHY.scale.label, fontWeight: 600, color: COLORS.boneMuted, marginTop: 4 }}>{isEs ? "ENERGÍA DIARIA TOTAL" : "TOTAL DAILY ENERGY"}</div>
             <div style={{ display: 'flex', fontSize: TYPOGRAPHY.scale.h2, fontWeight: 600, color: COLORS.gold, fontFamily: TYPOGRAPHY.body }}>{`${metabolicProfile.tdee || ""}`}</div>
-            <Badge label="MAINTENANCE" variant="outline" />
+            <Badge label={isEs ? "MANTENIMIENTO" : "MAINTENANCE"} variant="outline" />
           </div>
           <div style={{ flex: 1.5, display: 'flex', flexDirection: 'column', alignItems: 'center', backgroundColor: isDeficit ? 'rgba(20, 184, 166, 0.05)' : 'rgba(201, 168, 76, 0.05)', borderRadius: 8, padding: '8px 0' }}>
-            <div style={{ display: 'flex', fontSize: TYPOGRAPHY.scale.body, color: surplusColor, fontWeight: 700 }}>{surplusIcon || ""}</div>
-            <div style={{ display: 'flex', fontSize: TYPOGRAPHY.scale.label, fontWeight: 700, color: COLORS.teal, marginTop: 4 }}>YOUR DAILY TARGET</div>
+            <div style={{ display: 'flex', fontSize: TYPOGRAPHY.scale.body, color: surplusColor, fontWeight: 700 }}>{surplusIcon}</div>
+            <div style={{ display: 'flex', fontSize: TYPOGRAPHY.scale.label, fontWeight: 700, color: COLORS.teal, marginTop: 4 }}>{isEs ? "TU OBJETIVO DIARIO" : "YOUR DAILY TARGET"}</div>
             <div style={{ display: 'flex', fontSize: TYPOGRAPHY.scale.h1, fontWeight: 700, color: COLORS.gold, fontFamily: TYPOGRAPHY.body }}>{`${metabolicProfile.targetKcal || metabolicProfile.tdee + (metabolicProfile.surplus || 0)}`}</div>
             <Badge label={(String(surplusLabel || "")).toUpperCase()} variant={isDeficit ? "outline" : "gold"} />
           </div>
@@ -769,43 +779,33 @@ export const Page2 = ({ identity, metabolicProfile, notes, totalPages = 3 }: { i
             />
           </div>
         </Card>
-        <Card headerTitle="MACRO BREAKDOWN & LOGIC" style={{ flex: 1.4, marginBottom: 0 }}>
+        <Card headerTitle={isEs ? "DESGLOSE DE MACROS Y LÓGICA" : "MACRO BREAKDOWN & LOGIC"} style={{ flex: 1.4, marginBottom: 0 }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 20, width: '100%', padding: '4px 0' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
               <div style={{ display: 'flex', fontSize: 13.5, color: COLORS.bone }}>
-                <strong>Protein — {metabolicProfile.proteinGrams || ""}g / {metabolicProfile.proteinGrams * 4}kcal / {Math.round((metabolicProfile.proteinGrams * 4 / targetCal) * 100)}%</strong>
+                <strong>{isEs ? "Proteína" : "Protein"} — {metabolicProfile.proteinGrams}g / {metabolicProfile.proteinGrams * 4}kcal / {Math.round((metabolicProfile.proteinGrams * 4 / targetCal) * 100)}%</strong>
               </div>
-              <div style={{ display: 'flex', fontSize: 11, fontWeight: 300, color: COLORS.slate }}>Building block for muscle retention.</div>
-            </div>
-            
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-              <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                <div style={{ width: 12, height: 12, backgroundColor: COLORS.donutProtein, borderRadius: 2 }} />
-                <div style={{ display: 'flex', fontSize: 13.5, color: COLORS.bone }}>
-                  <strong>Protein — {metabolicProfile.proteinGrams || ""}g / {metabolicProfile.proteinGrams * 4}kcal / {Math.round((metabolicProfile.proteinGrams * 4 / targetCal) * 100)}%</strong>
-                </div>
-              </div>
-              <div style={{ display: 'flex', fontSize: 11, fontWeight: 300, color: COLORS.slate, paddingLeft: 20 }}>Building block for muscle retention.</div>
+              <div style={{ display: 'flex', fontSize: 11, fontWeight: 300, color: COLORS.slate }}>{isEs ? "Bloque fundamental para la retención muscular." : "Building block for muscle retention."}</div>
             </div>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
               <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                 <div style={{ width: 12, height: 12, backgroundColor: COLORS.donutCarbs, borderRadius: 2 }} />
                 <div style={{ display: 'flex', fontSize: 13.5, color: COLORS.bone }}>
-                  <strong>Carbohydrates — {metabolicProfile.carbsGrams || ""}g / {metabolicProfile.carbsGrams * 4}kcal / {Math.round((metabolicProfile.carbsGrams * 4 / targetCal) * 100)}%</strong>
+                  <strong>{isEs ? "Carbohidratos" : "Carbohydrates"} — {metabolicProfile.carbsGrams}g / {metabolicProfile.carbsGrams * 4}kcal / {Math.round((metabolicProfile.carbsGrams * 4 / targetCal) * 100)}%</strong>
                 </div>
               </div>
-              <div style={{ display: 'flex', fontSize: 11, fontWeight: 300, color: COLORS.slate, paddingLeft: 20 }}>{`Strategic energy for ${(String(identity.goal || "")).toUpperCase()} phase.`}</div>
+              <div style={{ display: 'flex', fontSize: 11, fontWeight: 300, color: COLORS.slate, paddingLeft: 20 }}>{isEs ? `Energía estratégica para la fase de ${(String(identity.goal)).toUpperCase()}.` : `Strategic energy for ${(String(identity.goal)).toUpperCase()} phase.`}</div>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
               <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                 <div style={{ width: 12, height: 12, backgroundColor: COLORS.donutFats, borderRadius: 2 }} />
                 <div style={{ display: 'flex', fontSize: 13.5, color: COLORS.bone }}>
-                  <strong>Fats — {metabolicProfile.fatsGrams || ""}g / {metabolicProfile.fatsGrams * 9}kcal / {100 - Math.round((metabolicProfile.proteinGrams * 4 / targetCal) * 100) - Math.round((metabolicProfile.carbsGrams * 4 / targetCal) * 100)}%</strong>
+                  <strong>{isEs ? "Grasas" : "Fats"} — {metabolicProfile.fatsGrams}g / {metabolicProfile.fatsGrams * 9}kcal / {100 - Math.round((metabolicProfile.proteinGrams * 4 / targetCal) * 100) - Math.round((metabolicProfile.carbsGrams * 4 / targetCal) * 100)}%</strong>
                 </div>
               </div>
-              <div style={{ display: 'flex', fontSize: 11, fontWeight: 300, color: COLORS.slate, paddingLeft: 20 }}>{`Optimized fuel for ${identity.bodyType || ""} metabolism.`}</div>
+              <div style={{ display: 'flex', fontSize: 11, fontWeight: 300, color: COLORS.slate, paddingLeft: 20 }}>{isEs ? `Combustible optimizado para el metabolismo ${identity.bodyType}.` : `Optimized fuel for ${identity.bodyType} metabolism.`}</div>
             </div>
           </div>
         </Card>
@@ -814,18 +814,20 @@ export const Page2 = ({ identity, metabolicProfile, notes, totalPages = 3 }: { i
   );
 };
 
-export const Page3 = ({ meals, metabolicProfile, pageNumber, totalPages }: { meals: Meal[]; metabolicProfile: MetabolicProfile; pageNumber: number; totalPages: number }) => (
-  <PageWrapper pageNumber={pageNumber || ""} totalPages={totalPages || ""}>
-    <PageHeader title="YOUR DAILY ACTION BLUEPRINT" pageNumber={pageNumber || ""} />
+export const Page3 = ({ meals, metabolicProfile, pageNumber, totalPages, locale = 'en' }: { meals: Meal[]; metabolicProfile: MetabolicProfile; pageNumber: number; totalPages: number; locale?: string }) => {
+  const isEs = locale === 'es';
+  return (
+  <PageWrapper pageNumber={pageNumber} totalPages={totalPages}>
+    <PageHeader title={isEs ? "TU PLAN DE ACCIÓN DIARIA" : "YOUR DAILY ACTION BLUEPRINT"} pageNumber={pageNumber} />
 
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14.4, width: '100%' }}>
       
       {/* §9. DailyTargets */}
-      <Card headerTitle="YOUR DAILY TARGETS" style={{ marginBottom: 0, padding: '10px 13px' }}>
-        <DailyTargets metabolicProfile={metabolicProfile || ""} />
+      <Card headerTitle={isEs ? "TUS METAS DIARIAS" : "YOUR DAILY TARGETS"} style={{ marginBottom: 0, padding: '10px 13px' }}>
+        <DailyTargets metabolicProfile={metabolicProfile} locale={locale} />
       </Card>
 
-      <Card headerTitle="SUGGESTED MEAL STRUCTURE" style={{ marginBottom: 0, padding: '10px 13px' }}>
+      <Card headerTitle={isEs ? "ESTRUCTURA DE COMIDAS SUGERIDA" : "SUGGESTED MEAL STRUCTURE"} style={{ marginBottom: 0, padding: '10px 13px' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: '100%' }}>
           {(meals.length > 0 ? meals : [
             { name: 'Meal 1 - Morning', timeOfDay: '7:00-9:00 AM', calories: 600, protein: 40, carbs: 60, fats: 20 },
@@ -861,11 +863,11 @@ export const Page3 = ({ meals, metabolicProfile, pageNumber, totalPages }: { mea
       </Card>
 
       {/* §12. MovementIconBlock — Daily Habits */}
-      <Card headerTitle="DAILY HABIT TARGETS" style={{ marginBottom: 0, padding: '10px 13px' }}>
+      <Card headerTitle={isEs ? "OBJETIVOS DE HÁBITOS DIARIOS" : "DAILY HABIT TARGETS"} style={{ marginBottom: 0, padding: '10px 13px' }}>
         <MovementIconBlock items={[
-          { icon: ICONS.water(), label: 'Water Intake', value: `${metabolicProfile.water || 3.5}L`, sub: 'Hit this minimum' },
-          { icon: ICONS.movement(), label: 'Daily Movement', value: (metabolicProfile.steps || 8500).toLocaleString(), sub: 'Steps minimum' },
-          { icon: ICONS.sleep(), label: 'Sleep Target', value: '7-9', sub: 'Hours per night' },
+          { icon: ICONS.water(), label: isEs ? 'Consumo de Agua' : 'Water Intake', value: `${metabolicProfile.water || 3.5}L`, sub: isEs ? 'Alcanza este mínimo' : 'Hit this minimum' },
+          { icon: ICONS.movement(), label: isEs ? 'Movimiento Diario' : 'Daily Movement', value: (metabolicProfile.steps || 8500).toLocaleString(isEs ? 'es-ES' : 'en-US'), sub: isEs ? 'Pasos mínimos' : 'Steps minimum' },
+          { icon: ICONS.sleep(), label: isEs ? 'Meta de Sueño' : 'Sleep Target', value: '7-9', sub: isEs ? 'Horas por noche' : 'Hours per night' },
         ]} />
       </Card>
 
@@ -881,23 +883,24 @@ export const Page3 = ({ meals, metabolicProfile, pageNumber, totalPages }: { mea
         width: '100%'
       }}>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <div style={{ display: 'flex', fontSize: 9.5, fontWeight: 600, color: COLORS.boneMuted }}>READY TO LEVEL UP?</div>
-          <div style={{ display: 'flex', fontSize: TYPOGRAPHY.scale.body, fontWeight: 600, color: COLORS.bone, marginTop: 2 }}>Track, Adapt & Transform with the Metamorfit App</div>
+          <div style={{ display: 'flex', fontSize: 9.5, fontWeight: 600, color: COLORS.boneMuted }}>{isEs ? "¿LISTO PARA SUBIR DE NIVEL?" : "READY TO LEVEL UP?"}</div>
+          <div style={{ display: 'flex', fontSize: TYPOGRAPHY.scale.body, fontWeight: 600, color: COLORS.bone, marginTop: 2 }}>{isEs ? "Rastrea, Adapta y Transforma con la App Metamorfit" : "Track, Adapt & Transform with the Metamorfit App"}</div>
         </div>
         <div style={{
           display: 'flex',
           backgroundColor: COLORS.gold,
           color: COLORS.black,
-          padding: `${SPACING.line || ""}px ${SPACING.cellPadding || ""}px`,
+          padding: `${SPACING.line}px ${SPACING.cellPadding}px`,
           borderRadius: 4,
           fontSize: 9.5,
           fontWeight: 600,
           fontFamily: TYPOGRAPHY.body,
-        }}>JOIN THE WAITLIST →</div>
+        }}>{isEs ? "ÚNETE A LA LISTA DE ESPERA →" : "JOIN THE WAITLIST →"}</div>
       </div>
     </div>
     </PageWrapper>
   );
+};
 
 // ============================================================
 // §8. NotesPage — Two-column condensed layout
@@ -906,13 +909,16 @@ export const NotesPage = ({
   intelligenceNotes, 
   explanation,
   pageNumber, 
-  totalPages 
+  totalPages,
+  locale = 'en'
 }: { 
   intelligenceNotes: IntelligenceNote[]; 
   explanation?: string;
   pageNumber: number; 
   totalPages: number; 
+  locale?: string;
 }) => {
+  const isEs = locale === 'es';
   const sortedNotes = [...intelligenceNotes].sort((a, b) => {
     const catA = CATEGORY_ORDER.indexOf(a.category);
     const catB = CATEGORY_ORDER.indexOf(b.category);
@@ -922,8 +928,8 @@ export const NotesPage = ({
   }).slice(0, 4);
 
   return (
-    <PageWrapper pageNumber={pageNumber || ""} totalPages={totalPages || ""}>
-      <PageHeader title="PERSONALIZED PLAN NOTES" pageNumber={pageNumber || ""} />
+    <PageWrapper pageNumber={pageNumber} totalPages={totalPages}>
+      <PageHeader title={isEs ? "NOTAS DEL PLAN PERSONALIZADO" : "PERSONALIZED PLAN NOTES"} pageNumber={pageNumber} />
 
       {explanation && (
         <div style={{ 
@@ -943,10 +949,11 @@ export const NotesPage = ({
 
       <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: 12, width: '100%' }}>
         {sortedNotes.map((note, i) => {
-          const titles = ["METABOLIC FORMULA", "SOMATOTYPE ALIGNMENT", "RECOMPOSITION FACTOR", "ACTIVITY SCALE"];
-          const title = titles[i] || "METABOLIC INSIGHT";
+          const titlesEn = ["METABOLIC FORMULA", "SOMATOTYPE ALIGNMENT", "RECOMPOSITION FACTOR", "ACTIVITY SCALE"];
+          const titlesEs = ["FÓRMULA METABÓLICA", "ALINEACIÓN DE SOMATOTIPO", "FACTOR DE RECOMPOSICIÓN", "ESCALA DE ACTIVIDAD"];
+          const title = (isEs ? titlesEs[i] : titlesEn[i]) || (isEs ? "PERSPECTIVA METABÓLICA" : "METABOLIC INSIGHT");
           return (
-            <div key={i || ""} style={{ display: 'flex', width: '240px' }}>
+            <div key={i} style={{ display: 'flex', width: '240px' }}>
               <NoteCard title={title} text={cleanText(note.whyThisMatters)} />
             </div>
           );
@@ -978,39 +985,42 @@ export const MealDetailsPage = ({
   metabolicProfile,
   pageNumber,
   totalPages,
-  showTargets
+  showTargets,
+  locale = 'en'
 }: {
   meals: Meal[];
   metabolicProfile?: MetabolicProfile;
   pageNumber: number;
   totalPages: number;
   showTargets?: boolean;
+  locale?: string;
 }) => {
+  const isEs = locale === 'es';
   // Filter out empty/TBD meals
   const validMeals = meals.filter(m => !isMealEmpty(m));
 
   return (
-    <PageWrapper pageNumber={pageNumber || ""} totalPages={totalPages || ""}>
-      <PageHeader title="DETAILED MEAL BREAKDOWN" pageNumber={pageNumber || ""} />
+    <PageWrapper pageNumber={pageNumber} totalPages={totalPages}>
+      <PageHeader title={isEs ? "DESGLOSE DETALLADO DE COMIDAS" : "DETAILED MEAL BREAKDOWN"} pageNumber={pageNumber} />
 
       {/* DailyTargets at top of first meal page to eliminate dead space */}
       {showTargets && metabolicProfile && (
-        <Card headerTitle="YOUR DAILY TARGETS" headerColor={COLORS.teal || ""} style={{ marginBottom: SPACING.blockCompact, padding: SPACING.cardPaddingCompact }}>
-          <DailyTargets metabolicProfile={metabolicProfile || ""} />
+        <Card headerTitle={isEs ? "TUS METAS DIARIAS" : "YOUR DAILY TARGETS"} headerColor={COLORS.teal} style={{ marginBottom: SPACING.blockCompact, padding: SPACING.cardPaddingCompact }}>
+          <DailyTargets metabolicProfile={metabolicProfile} locale={locale} />
         </Card>
       )}
       
       <div style={{ display: 'flex', flexDirection: 'column', gap: SPACING.blockCompact, width: '100%' }}>
         {validMeals.length === 0 && (
-          <div style={{ display: 'flex', fontSize: TYPOGRAPHY.scale.label, color: COLORS.boneMuted, fontStyle: 'italic' }}>No meal data available.</div>
+          <div style={{ display: 'flex', fontSize: TYPOGRAPHY.scale.label, color: COLORS.boneMuted, fontStyle: 'italic' }}>{isEs ? "No hay datos de comidas disponibles." : "No meal data available."}</div>
         )}
         {validMeals.map((meal, i) => {
           const isSnack = meal.name.toUpperCase() === 'SNACK';
           return (
             <Card 
-              key={i || ""} 
-              headerTitle={(String(meal.name || "")).toUpperCase()} 
-              headerColor={COLORS.teal || ""} 
+              key={i} 
+              headerTitle={(String(meal.name)).toUpperCase()} 
+              headerColor={COLORS.teal} 
               style={{ 
                 padding: isSnack ? '10px 16px' : SPACING.cardPaddingCompact, 
                 marginBottom: 0,
@@ -1018,7 +1028,7 @@ export const MealDetailsPage = ({
                 pageBreakInside: isSnack ? 'auto' : 'avoid'
               }}
             >
-              <MealTable meal={meal || ""} compact={isSnack || ""} />
+              <MealTable meal={meal} compact={isSnack} locale={locale} />
             </Card>
           );
         })}
@@ -1034,37 +1044,40 @@ export const CalibrationRecapPage = ({
   metabolicProfile,
   delivered,
   pageNumber,
-  totalPages
+  totalPages,
+  locale = 'en'
 }: {
   metabolicProfile: MetabolicProfile;
   delivered: DeliveredMacros;
   pageNumber: number;
   totalPages: number;
+  locale?: string;
 }) => {
+  const isEs = locale === 'es';
   const targetKcal = metabolicProfile.targetKcal || metabolicProfile.tdee;
   
   const pVar = delivered.protein - metabolicProfile.proteinGrams;
   const cVar = delivered.carb - metabolicProfile.carbsGrams;
 
   const rows = [
-    { label: 'Calories', goal: targetKcal, plan: delivered.kcal, var: delivered.kcal - targetKcal, unit: '' },
-    { label: 'Protein', goal: metabolicProfile.proteinGrams, plan: delivered.protein, var: pVar, unit: 'g' },
-    { label: 'Carbs', goal: metabolicProfile.carbsGrams, plan: delivered.carb, var: cVar, unit: 'g' },
-    { label: 'Fats', goal: metabolicProfile.fatsGrams, plan: delivered.fat, var: delivered.fat - metabolicProfile.fatsGrams, unit: 'g' },
+    { label: isEs ? 'Calorías' : 'Calories', goal: targetKcal, plan: delivered.kcal, var: delivered.kcal - targetKcal, unit: '' },
+    { label: isEs ? 'Proteína' : 'Protein', goal: metabolicProfile.proteinGrams, plan: delivered.protein, var: pVar, unit: 'g' },
+    { label: isEs ? 'Carbohidratos' : 'Carbs', goal: metabolicProfile.carbsGrams, plan: delivered.carb, var: cVar, unit: 'g' },
+    { label: isEs ? 'Grasas' : 'Fats', goal: metabolicProfile.fatsGrams, plan: delivered.fat, var: delivered.fat - metabolicProfile.fatsGrams, unit: 'g' },
   ];
 
   return (
-    <PageWrapper pageNumber={pageNumber || ""} totalPages={totalPages || ""}>
-      <PageHeader title="CALIBRATION RECAP" pageNumber={pageNumber || ""} />
+    <PageWrapper pageNumber={pageNumber} totalPages={totalPages}>
+      <PageHeader title={isEs ? "RESUMEN DE CALIBRACIÓN" : "CALIBRATION RECAP"} pageNumber={pageNumber} />
 
-      <Card headerTitle="COMPARATIVE AUDIT" style={{ padding: SPACING.cardPaddingCompact }}>
+      <Card headerTitle={isEs ? "AUDITORÍA COMPARATIVA" : "COMPARATIVE AUDIT"} style={{ padding: SPACING.cardPaddingCompact }}>
         <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
           {/* Header Row */}
-          <div style={{ display: 'flex', flexDirection: 'row', borderBottom: `1px solid ${COLORS.teal || ""}`, paddingBottom: SPACING.cellPaddingCompact, marginBottom: SPACING.cellPaddingCompact }}>
-            <div style={{ display: 'flex', flex: 3, fontSize: TYPOGRAPHY.scale.body, fontWeight: 700, color: COLORS.teal, fontFamily: TYPOGRAPHY.heading }}>METRIC</div>
-            <div style={{ display: 'flex', flex: 2, fontSize: TYPOGRAPHY.scale.body, fontWeight: 700, color: COLORS.teal, fontFamily: TYPOGRAPHY.heading, justifyContent: 'flex-end' }}>GOAL</div>
+          <div style={{ display: 'flex', flexDirection: 'row', borderBottom: `1px solid ${COLORS.teal}`, paddingBottom: SPACING.cellPaddingCompact, marginBottom: SPACING.cellPaddingCompact }}>
+            <div style={{ display: 'flex', flex: 3, fontSize: TYPOGRAPHY.scale.body, fontWeight: 700, color: COLORS.teal, fontFamily: TYPOGRAPHY.heading }}>{isEs ? "MÉTRICA" : "METRIC"}</div>
+            <div style={{ display: 'flex', flex: 2, fontSize: TYPOGRAPHY.scale.body, fontWeight: 700, color: COLORS.teal, fontFamily: TYPOGRAPHY.heading, justifyContent: 'flex-end' }}>{isEs ? "META" : "GOAL"}</div>
             <div style={{ display: 'flex', flex: 2, fontSize: TYPOGRAPHY.scale.body, fontWeight: 700, color: COLORS.teal, fontFamily: TYPOGRAPHY.heading, justifyContent: 'flex-end' }}>PLAN</div>
-            <div style={{ display: 'flex', flex: 2, fontSize: TYPOGRAPHY.scale.body, fontWeight: 700, color: COLORS.teal, fontFamily: TYPOGRAPHY.heading, justifyContent: 'flex-end' }}>VARIANCE</div>
+            <div style={{ display: 'flex', flex: 2, fontSize: TYPOGRAPHY.scale.body, fontWeight: 700, color: COLORS.teal, fontFamily: TYPOGRAPHY.heading, justifyContent: 'flex-end' }}>{isEs ? "VARIANZA" : "VARIANCE"}</div>
           </div>
           
           {/* Data Rows */}
@@ -1088,7 +1101,7 @@ export const CalibrationRecapPage = ({
                 <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', gap: 8 }}>
                   {ICONS.protein(COLORS.teal)}
                   <div style={{ display: 'flex', fontSize: TYPOGRAPHY.scale.label, color: COLORS.bone, lineHeight: TYPOGRAPHY.lineHeight.body, fontWeight: 500, marginTop: 2 }}>
-                    Protein Gap Detected: We recommend adding one high-protein snack (e.g., Whey Isolate or 50g chicken) to reach Elite targets.
+                    {isEs ? "Brecha de proteína detectada: Recomendamos añadir un snack alto en proteína (ej. Proteína de Suero o 50g de pollo) para alcanzar metas de Élite." : "Protein Gap Detected: We recommend adding one high-protein snack (e.g., Whey Isolate or 50g chicken) to reach Elite targets."}
                   </div>
                 </div>
               )}
@@ -1097,18 +1110,18 @@ export const CalibrationRecapPage = ({
                 <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', gap: 8 }}>
                   {ICONS.carb(COLORS.slate)}
                   <div style={{ display: 'flex', fontSize: TYPOGRAPHY.scale.label, color: COLORS.bone, lineHeight: TYPOGRAPHY.lineHeight.body, fontWeight: 500, marginTop: 2 }}>
-                    Carb Note: Your intake includes high-fiber greens and lentils, which are essential for digestive health during a cut.
+                    {isEs ? "Nota de carbohidratos: Tu ingesta incluye verduras y lentejas altas en fibra, que son esenciales para la salud digestiva durante un déficit." : "Carb Note: Your intake includes high-fiber greens and lentils, which are essential for digestive health during a cut."}
                   </div>
                 </div>
               )}
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 12, borderTop: `1px solid ${COLORS.goldDivider || ""}`, paddingTop: 12 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 12, borderTop: `1px solid ${COLORS.goldDivider}`, paddingTop: 12 }}>
                 <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div style={{ display: 'flex', fontSize: TYPOGRAPHY.scale.label, color: COLORS.bone }}>Precision not feeling right?</div>
-                  <div style={{ display: 'flex', backgroundColor: COLORS.teal, color: COLORS.bone, padding: '4px 12px', borderRadius: 4, fontSize: TYPOGRAPHY.scale.label, fontWeight: 600 }}>Request Consultation (support@metamorfit.io)</div>
+                  <div style={{ display: 'flex', fontSize: TYPOGRAPHY.scale.label, color: COLORS.bone }}>{isEs ? "¿La precisión no se siente correcta?" : "Precision not feeling right?"}</div>
+                  <div style={{ display: 'flex', backgroundColor: COLORS.teal, color: COLORS.bone, padding: '4px 12px', borderRadius: 4, fontSize: TYPOGRAPHY.scale.label, fontWeight: 600 }}>{isEs ? "Solicitar Consulta (support@metamorfit.io)" : "Request Consultation (support@metamorfit.io)"}</div>
                 </div>
                 <div style={{ display: 'flex', fontSize: TYPOGRAPHY.scale.ingredient, color: COLORS.slate, fontStyle: 'italic', marginTop: 4 }}>
-                  Adherence over Perfection: Aim for 80% daily consistency.
+                  {isEs ? "Adherencia sobre Perfección: Apunta a un 80% de consistencia diaria." : "Adherence over Perfection: Aim for 80% daily consistency."}
                 </div>
               </div>
             </div>

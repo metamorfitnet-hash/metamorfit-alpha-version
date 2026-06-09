@@ -14,11 +14,13 @@ import Step5Activity from './steps/Step5Activity';
 import Step6Calibrate from './steps/Step6Calibrate';
 import { useOnboardingSession } from '@/hooks/useOnboardingSession';
 import { useTranslation } from 'react-i18next';
+import AhaPreview from '../AhaPreview';
 
 export default function OnboardingContainer() {
   const { ledger, initSession, saveStep, finalize, loading: sessionLoading, error: sessionError } = useOnboardingSession();
   const { i18n } = useTranslation();
   
+  const [lifecycle, setLifecycle] = useState<'FORM' | 'PREVIEW' | 'STABLE_RESULTS'>('FORM');
   const [state, setState] = useState<OnboardingState>({
     locale: 'en',
     currentStep: 1,
@@ -97,6 +99,7 @@ export default function OnboardingContainer() {
 
   const handleCalibrate = async () => {
     setIsCalibrating(true);
+    setLifecycle('PREVIEW');
 
     try {
       let finalData;
@@ -125,7 +128,8 @@ export default function OnboardingContainer() {
           bodyType: state.somatotype?.toLowerCase() || 'mesomorph',
           bodyFatPercent: state.bodyFatPercent ? Number(state.bodyFatPercent) : undefined,
           precisionMode: state.bodyFatEnabled,
-          somatotypeTweak: state.somatotypeTweakEnabled
+          somatotypeTweak: state.somatotypeTweakEnabled,
+          locale: state.locale
         };
 
         const res = await fetch('/api/calculator', {
@@ -164,12 +168,14 @@ export default function OnboardingContainer() {
       }, 600);
 
       setTimeout(() => {
+        setLifecycle('STABLE_RESULTS');
         window.location.href = '/calculator'; // Results Panel logic reads from ledger/session
       }, 1000);
 
     } catch (err) {
       console.error("Calculation Error:", err);
       setIsCalibrating(false);
+      setLifecycle('FORM');
       alert("Metabolic Engine Error. Please check your inputs.");
     }
   };
@@ -196,66 +202,78 @@ export default function OnboardingContainer() {
           </button>
         </div>
 
-        <OnboardingHeader />
-        <OnboardingProgressBar currentStep={state.currentStep} totalSteps={6} isCalibrating={isCalibrating} />
-        
-        <div className="mt-8 flex-1 relative w-full">
-          {state.currentStep === 1 && (
-            <Step1PersonaSelect state={state} updateState={updateState} />
-          )}
+        {lifecycle === 'FORM' && (
+          <>
+            <OnboardingHeader />
+            <OnboardingProgressBar currentStep={state.currentStep} totalSteps={6} isCalibrating={isCalibrating} />
+            
+            <div className="mt-8 flex-1 relative w-full">
+              {state.currentStep === 1 && (
+                <Step1PersonaSelect state={state} updateState={updateState} />
+              )}
 
-          {state.currentStep === 2 && (
-            <Step2GoalSelect state={state} updateState={updateState} />
-          )}
+              {state.currentStep === 2 && (
+                <Step2GoalSelect state={state} updateState={updateState} />
+              )}
 
-          {state.currentStep === 3 && (
-            <Step3Metrics state={state} updateState={updateState} />
-          )}
+              {state.currentStep === 3 && (
+                <Step3Metrics state={state} updateState={updateState} />
+              )}
 
-          {state.currentStep === 4 && (
-            <Step4Somatotype state={state} updateState={updateState} />
-          )}
+              {state.currentStep === 4 && (
+                <Step4Somatotype state={state} updateState={updateState} />
+              )}
 
-          {state.currentStep === 5 && (
-            <Step5Activity state={state} updateState={updateState} />
-          )}
+              {state.currentStep === 5 && (
+                <Step5Activity state={state} updateState={updateState} />
+              )}
 
-          {state.currentStep === 6 && (
-            <Step6Calibrate 
-              state={state} 
-              updateState={updateState} 
-              onCalibrate={handleCalibrate} 
-              isCalibrating={isCalibrating} 
-            />
-          )}
+              {state.currentStep === 6 && (
+                <Step6Calibrate 
+                  state={state} 
+                  updateState={updateState} 
+                  onCalibrate={handleCalibrate} 
+                  isCalibrating={isCalibrating} 
+                />
+              )}
 
-          {state.currentStep > 6 && (
-            <div className="p-6 rounded-[var(--border-radius-card)] bg-[var(--bg-card)]">
-               <h2 className="font-bebas text-2xl mb-4 text-[var(--text-primary)]">Step {state.currentStep} Placeholder</h2>
-               <p className="text-[var(--text-muted)]">This step will be implemented in the next phase.</p>
-               
-               <div className="mt-6 flex gap-4">
-                  {state.currentStep < 6 && (
-                      <button 
-                          onClick={() => updateState({ currentStep: (state.currentStep + 1) as OnboardingState['currentStep'] })}
-                          className="px-6 py-2 rounded font-bold uppercase tracking-wide hover:opacity-90 transition-opacity bg-[var(--gold-primary)] text-[#121212]"
-                      >
-                          Next Step (Dev)
-                      </button>
-                  )}
-               </div>
+              {state.currentStep > 6 && (
+                <div className="p-6 rounded-[var(--border-radius-card)] bg-[var(--bg-card)]">
+                   <h2 className="font-bebas text-2xl mb-4 text-[var(--text-primary)]">Step {state.currentStep} Placeholder</h2>
+                   <p className="text-[var(--text-muted)]">This step will be implemented in the next phase.</p>
+                   
+                   <div className="mt-6 flex gap-4">
+                      {state.currentStep < 6 && (
+                          <button 
+                              onClick={() => updateState({ currentStep: (state.currentStep + 1) as OnboardingState['currentStep'] })}
+                              className="px-6 py-2 rounded font-bold uppercase tracking-wide hover:opacity-90 transition-opacity bg-[var(--gold-primary)] text-[#121212]"
+                          >
+                              Next Step (Dev)
+                          </button>
+                      )}
+                   </div>
+                </div>
+              )}
+
+              {state.currentStep > 1 && (
+                <button 
+                  onClick={handleBack}
+                  className="mt-6 font-medium text-sm flex items-center gap-2 hover:text-white transition-colors text-[var(--text-muted)]"
+                >
+                  ← BACK
+                </button>
+              )}
             </div>
-          )}
+          </>
+        )}
 
-          {state.currentStep > 1 && (
-            <button 
-              onClick={handleBack}
-              className="mt-6 font-medium text-sm flex items-center gap-2 hover:text-white transition-colors text-[var(--text-muted)]"
-            >
-              ← BACK
-            </button>
-          )}
-        </div>
+        {lifecycle === 'PREVIEW' && (
+          <AhaPreview 
+            formData={state} 
+            isLanguageSpanish={state.locale === 'es'} 
+            onEngineReady={() => {}}
+          />
+        )}
       </div>
     </div>
   );

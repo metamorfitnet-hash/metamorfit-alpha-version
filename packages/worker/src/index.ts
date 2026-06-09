@@ -40,7 +40,7 @@ export interface LedgerEntry {
 }
 
 const corsHeaders = {
-	"Access-Control-Allow-Origin": "https://beta.metamorfit.pro",
+	"Access-Control-Allow-Origin": "https://metamorfit.online",
 	"Access-Control-Allow-Methods": "GET, POST, PATCH, PUT, DELETE, OPTIONS",
 	"Access-Control-Allow-Headers": "Content-Type, Authorization, x-signature, x-timestamp",
 	"Access-Control-Max-Age": "86400",
@@ -53,9 +53,9 @@ export default Sentry.withSentry(
 	}),
 	{
 		async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
-			const allowedOrigins = ['https://beta.metamorfit.pro', 'http://localhost:3000'];
+			const allowedOrigins = ['https://metamorfit.online', 'http://localhost:3000'];
 			const origin = request.headers.get('Origin');
-			const corsOrigin = (origin && allowedOrigins.includes(origin)) ? origin : 'https://beta.metamorfit.pro';
+			const corsOrigin = (origin && allowedOrigins.includes(origin)) ? origin : 'https://metamorfit.online';
 
 			const corsHeaders = {
 				"Access-Control-Allow-Origin": corsOrigin,

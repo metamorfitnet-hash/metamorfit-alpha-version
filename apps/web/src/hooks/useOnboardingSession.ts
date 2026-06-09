@@ -4,7 +4,7 @@ import type { MacroPayload } from '@/types/session';
 const STORAGE_KEY = 'mm_uid';
 const STORAGE_KEY_FINALIZED = 'mm_finalized';
 const STORAGE_KEY_PAYLOAD = 'mm_session_payload';
-const UI_SECRET = process.env.NEXT_PUBLIC_MM_UI_SECRET || 'meta_beta_sec_994a8f9c2d1b73e_74561_xyz';
+const UI_SECRET = process.env.NEXT_PUBLIC_MM_UI_SECRET || 'meta_alpha_sec_a7c2e9f1b3d8k9m_42891_abc';
 
 export function useOnboardingSession() {
   const [ledger, setLedger] = useState<any>(null);
@@ -13,7 +13,7 @@ export function useOnboardingSession() {
   const [finalized, setFinalized] = useState<boolean>(false);
   const [sessionPayload, setSessionPayload] = useState<MacroPayload | null>(null);
 
-  const workerUrl = process.env.NEXT_PUBLIC_WORKER_A_URL || 'https://metamorfit-worker-beta.metamorfitnet.workers.dev';
+  const workerUrl = process.env.NEXT_PUBLIC_WORKER_A_URL || 'https://metamorfit-worker-alpha.metamorfitnet.workers.dev';
   const baseUrl = (workerUrl.endsWith('/') ? workerUrl.slice(0, -1) : workerUrl) + '/api';
 
   const getHeaders = () => ({

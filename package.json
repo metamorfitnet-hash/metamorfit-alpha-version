@@ -1,5 +1,5 @@
 {
-  "name": "metamorfit-beta",
+  "name": "metamorfit-alpha",
   "private": true,
   "workspaces": [
     "apps/*",
@@ -9,10 +9,10 @@
     "dev:all": "concurrently \"npm run dev --workspace=apps/web\" \"npm run dev --workspace=packages/worker\" \"npm run dev --workspace=packages/macro-engine -- --port 8788\"",
     "dev": "npm run dev --workspaces",
     "build": "npm run build --workspace=apps/web",
-    "beta:health": "echo 'Visit https://metamorfit-worker-beta.metamorfitnet.workers.dev/api/debug/health'",
-    "beta:pdf-test": "./scripts/test-pdf-pipeline.sh",
-    "beta:apply-schema": "./scripts/d1-apply-schema.sh",
-    "beta:list-plans": "./scripts/d1-list-user-plans.sh"
+    "alpha:health": "echo 'Visit https://metamorfit-worker-alpha.metamorfitnet.workers.dev/api/debug/health'",
+    "alpha:pdf-test": "./scripts/test-pdf-pipeline.sh",
+    "alpha:apply-schema": "./scripts/d1-apply-schema.sh",
+    "alpha:list-plans": "./scripts/d1-list-user-plans.sh"
   },
   "dependencies": {
     "@hono/node-server": "^1.8.0",
