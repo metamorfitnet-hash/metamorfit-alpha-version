@@ -149,8 +149,8 @@ function mapLedgerEntryToMacroPayload(entry: any): MacroPayload {
   const data = entry.data || {};
   
   const insights = (entry.personalizationCards || []).map((card: any) => ({
-    category: (card.title || "PRECISION").toLowerCase(),
-    text: card.description || ""
+    category: (card.category || card.title || "PRECISION").toLowerCase(),
+    text: card.text || card.description || ""
   }));
 
   return {

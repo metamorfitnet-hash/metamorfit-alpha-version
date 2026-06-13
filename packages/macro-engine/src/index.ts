@@ -49,15 +49,19 @@ app.post('/api/calculate', async (c) => {
     ? "Tu perfil metabólico está listo. Sigue estos objetivos para optimizar tus resultados." 
     : "Your metabolic profile is ready. Follow these targets to optimize your results.";
   try {
-    const aiPrompt = `Explain why these macros are good for a ${validation.data.age}yo ${validation.data.sex} weighing ${validation.data.weightKg}kg with a goal of ${validation.data.goal}${validation.data.bodyType ? ` and a ${validation.data.bodyType} body type` : ""}. 
+    const aiPrompt = `Analyze a ${validation.data.age}yo ${validation.data.sex} weighing ${validation.data.weightKg}kg with a goal of ${validation.data.goal}${validation.data.bodyType ? ` and a ${validation.data.bodyType} body type` : ""}. 
     Macros: ${JSON.stringify(result.macros)}. 
-    Keep it to 2-3 supportive sentences. No JSON, just plain text.`;
+    Return your analysis formatted EXACTLY with these three headers:
+    STRATEGY: [1 sentence strategy]
+    FUEL MATRIX: [1 sentence on macros]
+    EDGE TIP: [1 short tip]`;
     
-    const systemPrompt = `You are a supportive metabolic coach. Keep your explanations to 2-3 supportive, professional sentences in plain text (no markdown formatting, no JSON).
+    const systemPrompt = `You are an elite sports nutritionist AI.
    [LANGUAGE REQUIREMENT]
    The user's active language preference is: "${locale}".
-   If this value is 'es', you MUST write the entire narrative analysis, titles, and explanations in fluent Spanish (Neutral/Castilian). 
-   You MUST strictly maintain all English JSON key names exactly as originally designed.`;
+   If this value is 'es', you MUST write the entire narrative analysis in fluent Spanish (Neutral/Castilian). 
+   However, you MUST still use the exact English headers "STRATEGY:", "FUEL MATRIX:", and "EDGE TIP:".
+   Do not use JSON or markdown. Just the headers and text.`;
     
     const aiResponse: any = await c.env.AI.run("@cf/openai/gpt-oss-120b", { 
       messages: [

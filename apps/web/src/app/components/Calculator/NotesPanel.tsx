@@ -53,15 +53,34 @@ export function NotesPanel({ explanation, legacyInsights }: NotesPanelProps) {
         {hasExplanation ? (
           <article className="rounded-2xl bg-black/40 p-5 md:p-8 ring-1 ring-white/5 border-l-2 border-amber-500/30">
             <div className="whitespace-pre-line text-base md:text-[17px] leading-[1.85] text-neutral-100 font-body opacity-95 tracking-wide">
-              {explanation?.split(/(\*\*.*?\*\*|\*.*?\*)/g).map((part, i) => {
-                if (part.startsWith('**') && part.endsWith('**')) {
-                  return <strong key={i} className="font-bold text-white tracking-normal">{part.slice(2, -2)}</strong>;
+              {(() => {
+                if (!explanation) return null;
+                const hasHeaders = explanation.includes('STRATEGY:') || explanation.includes('FUEL MATRIX:');
+                if (hasHeaders) {
+                  const parts = explanation.split(/(STRATEGY:|FUEL MATRIX:|EDGE TIP:)/g).filter(p => p.trim() !== '');
+                  return (
+                    <div className="space-y-4">
+                      {parts.map((part, i) => {
+                        const trimmed = part.trim();
+                        if (['STRATEGY:', 'FUEL MATRIX:', 'EDGE TIP:'].includes(trimmed)) {
+                          return <span key={i} className="block text-[11px] font-bold uppercase tracking-[0.25em] text-amber-500 mt-4 mb-1 first:mt-0">{trimmed.replace(':', '')}</span>;
+                        }
+                        return <p key={i} className="text-base md:text-[17px] leading-[1.85] text-neutral-100 font-body opacity-95 tracking-wide m-0">{trimmed}</p>;
+                      })}
+                    </div>
+                  );
                 }
-                if (part.startsWith('*') && part.endsWith('*')) {
-                  return <em key={i} className="italic text-neutral-300">{part.slice(1, -1)}</em>;
-                }
-                return part;
-              })}
+                
+                return explanation.split(/(\*\*.*?\*\*|\*.*?\*)/g).map((part, i) => {
+                  if (part.startsWith('**') && part.endsWith('**')) {
+                    return <strong key={i} className="font-bold text-white tracking-normal">{part.slice(2, -2)}</strong>;
+                  }
+                  if (part.startsWith('*') && part.endsWith('*')) {
+                    return <em key={i} className="italic text-neutral-300">{part.slice(1, -1)}</em>;
+                  }
+                  return part;
+                });
+              })()}
             </div>
           </article>
         ) : legacyInsights && legacyInsights.length > 0 ? null : (

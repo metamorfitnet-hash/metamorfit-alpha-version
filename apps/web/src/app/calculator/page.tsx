@@ -11,7 +11,7 @@ import { ResultsPanel } from "../components/Calculator/ResultsPanel";
 import { useTranslation } from "react-i18next";
 
 function CalculatorContent() {
-  const { finalized, sessionPayload } = useOnboardingSession();
+  const { finalized, sessionPayload, loading } = useOnboardingSession();
   const router = useRouter();
   const { i18n } = useTranslation();
   const isEs = i18n.language === 'es';
@@ -31,7 +31,7 @@ function CalculatorContent() {
   }, [router]);
 
   // ── RESULTS VIEW (finalized) ────────────────────────────────────────────────
-  if (finalized && sessionPayload) {
+  if (!loading && finalized && sessionPayload) {
     console.log("[CalculatorContent] Rendering results with payload:", sessionPayload);
     const adaptedResult = {
       targets: {

@@ -13,11 +13,13 @@ const resources = {
   },
 };
 
+const savedLanguage = typeof window !== 'undefined' ? localStorage.getItem('mm_locale') : null;
+
 i18n
   .use(initReactI18next)
   .init({
     resources,
-    lng: 'en',
+    lng: savedLanguage || 'en',
     fallbackLng: 'en',
     interpolation: {
       escapeValue: false, // React already safeguards from xss
