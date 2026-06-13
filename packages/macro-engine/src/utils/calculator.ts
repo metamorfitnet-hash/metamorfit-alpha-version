@@ -307,7 +307,7 @@ export function calculateMacros(data: CalculatorInput) {
 
   return {
     success: true,
-    deploy_id: 'meta-beta-v4-synchronized',
+    deploy_id: 'meta-alpha-v1',
     bmr: Math.round(bmr),
     tdee: Math.round(tdee),
     targetKcal: Math.round(targetCalories),
