@@ -19,6 +19,13 @@ function CalculatorContent() {
   // If we haven't recovered session yet, wait a moment.
   // If we determine it's definitely not finalized, redirect to onboarding.
   useEffect(() => {
+    // Safely hydrate language from localStorage to prevent SSR mismatch
+    const savedLocale = typeof window !== 'undefined' ? localStorage.getItem('i18nextLng') : null;
+    if (savedLocale && (savedLocale === 'en' || savedLocale === 'es')) {
+      if (i18n.language !== savedLocale) {
+        i18n.changeLanguage(savedLocale);
+      }
+    }
     // We give the session hook a moment to read from sessionStorage.
     // If after 1 second we still don't have a payload, redirect back to onboarding.
     const timer = setTimeout(() => {

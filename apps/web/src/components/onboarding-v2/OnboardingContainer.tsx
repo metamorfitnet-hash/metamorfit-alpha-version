@@ -41,9 +41,18 @@ export default function OnboardingContainer() {
 
   // Sync session data to local state if recovered
   React.useEffect(() => {
+    // Safely hydrate language from localStorage to prevent SSR mismatch
+    const savedLocale = typeof window !== 'undefined' ? localStorage.getItem('i18nextLng') : null;
+    if (savedLocale && (savedLocale === 'en' || savedLocale === 'es')) {
+      if (i18n.language !== savedLocale) {
+        i18n.changeLanguage(savedLocale);
+      }
+    }
+
     if (ledger && ledger.data) {
       if (ledger.data.locale && ledger.data.locale !== i18n.language) {
         i18n.changeLanguage(ledger.data.locale);
+        localStorage.setItem('i18nextLng', ledger.data.locale);
       }
       setState(prev => ({ 
         ...prev, 
@@ -88,6 +97,9 @@ export default function OnboardingContainer() {
 
   const handleLanguageToggle = async (newLocale: 'en' | 'es') => {
     i18n.changeLanguage(newLocale);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('i18nextLng', newLocale);
+    }
     await updateState({ locale: newLocale });
   };
 

@@ -25,7 +25,18 @@ export default function AhaPreview({ formData, isLanguageSpanish, onEngineReady 
   const [animatedCalories, setAnimatedCalories] = useState(0);
   
   // Client-side baseline derivation (mirroring backend logic for instant feedback)
-  const targetCalories = formData?.calculatedSurplusBaseline || 2850; 
+  let quickTdee = 2850;
+  if (formData?.weightValue && formData?.heightValue && formData?.age && formData?.sex) {
+    const weight = formData.weightUnit === 'lbs' ? formData.weightValue * 0.453592 : formData.weightValue;
+    const height = formData.heightUnit === 'ft' ? formData.heightValue * 2.54 : formData.heightValue;
+    const base = 10 * weight + 6.25 * height - 5 * formData.age;
+    const bmr = formData.sex === 'male' ? base + 5 : base - 161;
+    const activityMult = { sedentary: 1.2, light: 1.375, moderate: 1.55, active: 1.725, very_active: 1.9 }[formData.activityLevel || 'moderate'] || 1.55;
+    quickTdee = Math.round(bmr * activityMult);
+    if (formData.goal === 'fat_loss') quickTdee = Math.round(quickTdee * 0.85);
+    if (formData.goal === 'muscle_gain') quickTdee = Math.round(quickTdee * 1.15);
+  }
+  const targetCalories = formData?.calculatedSurplusBaseline || quickTdee; 
 
   useEffect(() => {
     let start = 0;
