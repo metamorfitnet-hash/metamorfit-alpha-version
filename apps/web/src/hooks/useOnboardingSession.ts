@@ -114,7 +114,9 @@ export function useOnboardingSession() {
   // 5. Finalize — transitions to the "results" state
   const finalize = async () => {
     const userId = localStorage.getItem(STORAGE_KEY);
-    if (!userId) return;
+    if (!userId) {
+      throw new Error("No active session userId found for finalize");
+    }
 
     try {
       const res = await fetch(`${baseUrl}/ledger/${userId}/finalize`, {
