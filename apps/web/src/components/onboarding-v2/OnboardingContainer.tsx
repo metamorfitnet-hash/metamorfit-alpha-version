@@ -110,6 +110,29 @@ export default function OnboardingContainer() {
   };
 
   const handleCalibrate = async () => {
+    // Guard: ensure the shadow calculator in AhaPreview has all 4 required biometric inputs.
+    // If any are missing, the animation would fall back to 2850.
+    const missingInputs = !state.weightValue || !state.heightValue || !state.age || !state.sex;
+    if (missingInputs) {
+      console.warn('[OnboardingContainer] handleCalibrate: Missing biometric inputs for shadow calc.', {
+        weightValue: state.weightValue,
+        heightValue: state.heightValue,
+        age: state.age,
+        sex: state.sex,
+      });
+    } else {
+      console.log('[OnboardingContainer] Transitioning to PREVIEW with full formData snapshot:', {
+        weightValue: state.weightValue,
+        weightUnit: state.weightUnit,
+        heightValue: state.heightValue,
+        heightUnit: state.heightUnit,
+        age: state.age,
+        sex: state.sex,
+        activityLevel: state.activityLevel,
+        goal: state.goal,
+        locale: state.locale,
+      });
+    }
     setIsCalibrating(true);
     setLifecycle('PREVIEW');
 

@@ -45,9 +45,11 @@ app.post('/api/calculate', async (c) => {
   const locale = validation.data.locale || 'en';
   
   // ── AI INSIGHT ───────────────────────────────────────────────────────────
-  let explanation = locale === 'es' 
-    ? "Tu perfil metabólico está listo. Sigue estos objetivos para optimizar tus resultados." 
-    : "Your metabolic profile is ready. Follow these targets to optimize your results.";
+  // Structured fallback — uses required section headers so the frontend parser always
+  // renders a clean layout even when the Workers AI call fails or times out.
+  let explanation = locale === 'es'
+    ? `STRATEGY: Tu plan está diseñado para maximizar tu rendimiento metabólico con base en tu perfil único.\nFUEL MATRIX: Prioriza proteína para preservar músculo y grasas saludables para energía sostenida.\nEDGE TIP: Mantén consistencia en tus macros durante al menos 4 semanas para ver resultados medibles.`
+    : `STRATEGY: Your plan is engineered to maximise metabolic output based on your unique physiological profile.\nFUEL MATRIX: Prioritise protein to preserve lean mass and healthy fats for sustained energy output.\nEDGE TIP: Maintain macro consistency for at least 4 weeks to observe measurable body composition shifts.`;
   try {
     const aiPrompt = `Analyze a ${validation.data.age}yo ${validation.data.sex} weighing ${validation.data.weightKg}kg with a goal of ${validation.data.goal}${validation.data.bodyType ? ` and a ${validation.data.bodyType} body type` : ""}. 
     Macros: ${JSON.stringify(result.macros)}. 
@@ -74,8 +76,13 @@ app.post('/api/calculate', async (c) => {
     if (aiResponse?.choices?.[0]?.message?.content) {
       explanation = aiResponse.choices[0].message.content.trim();
     }
-  } catch (e) {
-    console.error('AI Insight failed:', e);
+  } catch (e: any) {
+    // Log full error details so we can diagnose gpt-oss-120b binding failures in Cloudflare logs.
+    console.error('[Macro Engine] Workers AI call failed. Serving structured fallback.');
+    console.error('[Macro Engine] Error name:', e?.name);
+    console.error('[Macro Engine] Error message:', e?.message);
+    console.error('[Macro Engine] Error stack:', e?.stack);
+    console.error('[Macro Engine] Full error object:', JSON.stringify(e, Object.getOwnPropertyNames(e)));
   }
 
   // Log to D1 (fire and forget)
