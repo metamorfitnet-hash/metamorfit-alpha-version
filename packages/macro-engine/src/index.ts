@@ -57,44 +57,35 @@ app.post('/api/calculate', async (c) => {
     // The response object is:
     //   { output: [{ content: [{ text: "..." }] }] }
     const aiResponse: any = await c.env.AI.run('@cf/openai/gpt-oss-120b', {
-      instructions: `You are the elite Metamorfit AI Metabolic Orchestrator. 
-Your sole task is to generate exactly three lines of highly specific, biomechanical coaching advice in Spanish based strictly on the user's profile data.
+      instructions: `You are the Metamorfit AI Performance Coach. 
+Output exactly 3 lines in fluent, premium Spanish using this exact format:
+STRATEGY: [One concise biomechanical sentence]
+FUEL MATRIX: [One concise macro allocation sentence]
+EDGE TIP: [One actionable tactical tip]
 
-CRITICAL LAWS:
-1. FORBIDDEN PHRASES: Never use generic platitudes like "Tu plan está diseñado...", "Prioriza proteína...", "Mantén la consistencia...", "para ver resultados", or "energía sostenida".
-2. ABSOLUTE BIOLOGICAL MECHANISMS: Speak like an elite coach. You must address their exact somatotype challenges using concepts like insulin management, gastric clearance, carbohydrate partitioning, glycogen saturation, or metabolic flexibility.
-3. OUTPUT FORMAT: Output exactly three lines. No markdown, no bolding, no code blocks, no intros/outros. Each line must match the uppercase English header, a colon, a space, and the Spanish sentence.
+CRITICAL RULES:
+- No generic platitudes (e.g., "Tu plan está diseñado"). Use exact metabolic terminology (e.g., insulin control, glycogen saturation, gastric clearance) based on the user's somatotype.
+- Wrap your final 3 lines strictly inside [START] and [END] tags. Any reasoning or thinking out loud must happen outside these tags.`,
 
-EXAMPLE FOR ENDOMORPH FAT LOSS (Apply this specific physiological depth):
-STRATEGY: Minimiza picos de insulina reduciendo carbohidratos simples y concentrando la ingesta energética en ventanas de alta actividad glucolítica.
-FUEL MATRIX: La asignación restringe carbohidratos para forzar la flexibilidad metabólica hacia la oxidación de grasas mientras protege la masa magra con proteína elevada.
-EDGE TIP: Consume tus carbohidratos exclusivamente alrededor del entrenamiento para asegurar su almacenamiento como glucógeno muscular y evitar la acumulación adiposa.
-
-EXAMPLE FOR ECTOMORPH/HARDGAINER MUSCLE GAIN (Apply this specific physiological depth):
-STRATEGY: Supera la tasa de aclaramiento gástrico priorizando alimentos de alta densidad calórica para evitar el catabolismo inducido por un metabolismo acelerado.
-FUEL MATRIX: El excedente calórico masivo utiliza carbohidratos complejos para saturar depósitos de glucógeno y mantener una señalización anabólica constante.
-EDGE TIP: Añade grasas saludables densas como crema de almendras a tus batidos para acumular calorías fácilmente sin inducir saciedad prematura.`,
-
-      input: `User Profile to Analyze:
-- Age/Sex: ${validation.data.age}yo ${validation.data.sex}
-- Weight: ${validation.data.weightKg}kg
-- Fitness Goal: ${validation.data.goal}
-- Somatotype: ${validation.data.bodyType || 'not specified'}
-- Macro Allocation: ${result.macros.protein}g Protein, ${result.macros.carbs}g Carbs, ${result.macros.fats}g Fat`
+      input: `Profile: ${validation.data.age}yo ${validation.data.sex}, ${validation.data.weightKg}kg, ${validation.data.bodyType || 'not specified'}, ${validation.data.goal}. Macros: ${result.macros.protein}g P / ${result.macros.carbs}g C / ${result.macros.fats}g F.`
     });
 
     // Log the raw response shape for diagnostics (visible in Cloudflare real-time logs).
     console.log('[Macro Engine] Raw AI response:', JSON.stringify(aiResponse));
 
     // Responses API returns: { output: [{ content: [{ text: "..." }] }] }
-    const responseText =
+    const rawResponse =
       aiResponse?.output?.[0]?.content?.[0]?.text ||   // Responses API shape
       aiResponse?.choices?.[0]?.message?.content ||     // fallback: Chat Completions shape
       aiResponse?.response ||                           // fallback: simple string wrapper
-      null;
+      "";
 
-    if (responseText && responseText.trim().length > 0) {
-      explanation = responseText.trim();
+    // Extract text within boundaries to drop reasoning noise
+    const match = rawResponse.match(/\[START\]([\s\S]*?)\[END\]/);
+    const filteredResponse = match ? match[1].trim() : rawResponse.trim();
+
+    if (filteredResponse && filteredResponse.length > 0) {
+      explanation = filteredResponse;
       console.log('[Macro Engine] AI insight generated successfully.');
     } else {
       console.warn('[Macro Engine] AI returned an empty or unrecognised response shape. Using structured fallback.');
