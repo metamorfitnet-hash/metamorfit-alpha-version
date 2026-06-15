@@ -84,11 +84,12 @@ export function useOnboardingSession() {
     }
   }, [sessionPayload]);
 
-  // 3. Initialize Session
-  const initSession = async () => {
+  // 3. Initialize Session — seeds locale into the MM_LEDGER from the first interaction
+  const initSession = async (locale: 'en' | 'es' = 'en') => {
     const res = await fetch(`${baseUrl}/ledger/init`, { 
       method: 'POST', 
-      headers: getHeaders() 
+      headers: getHeaders(),
+      body: JSON.stringify({ locale })
     });
     const data = await res.json();
     localStorage.setItem(STORAGE_KEY, data.userId);

@@ -79,41 +79,6 @@ export function Header({ variant = "app" }: HeaderProps) {
     );
   }
 
-  return (
-    <nav className="fixed top-0 w-full z-50 nav-header-blend">
-      <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-3 group">
-          <Image
-            src="/logo.jpg"
-            alt="Logo"
-            width={40}
-            height={40}
-            priority
-            className="w-10 h-10 transition-all duration-500 object-contain rounded"
-          />
-          <span className="font-heading text-2xl tracking-[0.1em] uppercase group-hover:text-mm-gold transition-colors text-mm-bone">
-            Metamorfit
-          </span>
-        </Link>
-        <div className="flex gap-6 items-center">
-          <Link
-            href="/calculator"
-            className="text-sm font-heading tracking-[0.2em] uppercase text-mm-bone/60 hover:text-mm-gold transition-colors"
-          >
-            Calculator
-          </Link>
-          <Link
-            href="/meal-plan"
-            className="text-sm font-heading tracking-[0.2em] uppercase text-mm-bone/60 hover:text-mm-gold transition-colors"
-          >
-            Meal Plan
-          </Link>
-          <LocaleToggle />
-          <button className="bg-white/5 border border-white/10 text-mm-bone px-6 py-2.5 rounded-lg font-heading tracking-widest hover:bg-mm-gold hover:text-mm-black transition-all text-sm uppercase">
-            Sign In
-          </button>
-        </div>
-      </div>
-    </nav>
-  );
+  // App-variant nav removed — lead magnet mode, no SaaS navigation.
+  return null;
 }

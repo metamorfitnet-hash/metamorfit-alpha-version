@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { OnboardingState } from '../types';
 import { useTranslation } from 'react-i18next';
+import i18n from '@/i18n';
 
 interface Props {
   state: OnboardingState;
@@ -58,40 +59,41 @@ export default function Step1PersonaSelect({ state, updateState }: Props) {
   ];
 
   useEffect(() => {
-    // Trigger animation on mount
     const timer = setTimeout(() => setAnimateIn(true), 50);
     return () => clearTimeout(timer);
   }, []);
 
+  // ── Language Selection ────────────────────────────────────────────────────────
+  // Immediately calls i18next.changeLanguage + persists to localStorage + patches state.
+  // This fires BEFORE any biometric data is entered, so the chosen locale is available
+  // when initSession() is called on persona commit.
+  const handleLocaleSelect = (lang: 'en' | 'es') => {
+    i18n.changeLanguage(lang);
+    localStorage.setItem('i18nextLng', lang);
+    updateState({ locale: lang });
+  };
+
   const handlePersonaClick = (personaId: OnboardingState['persona']) => {
-    // 1. Check validation
     if (!state.sex) {
       setError(t('step1.errorSex'));
       return;
     }
-    
     if (!state.age || state.age < 13 || state.age > 80) {
       setError(t('step1.errorAge'));
       return;
     }
-
-    // Clear error
     setError(null);
-    
-    // 2. Update state
     updateState({ persona: personaId });
-
-    // Auto-advance
     setTimeout(() => {
       updateState({ currentStep: 2 });
     }, 400);
   };
 
-  const isFormValid = 
-    state.sex !== null && 
-    state.age !== null && 
-    state.age >= 13 && 
-    state.age <= 80 && 
+  const isFormValid =
+    state.sex !== null &&
+    state.age !== null &&
+    state.age >= 13 &&
+    state.age <= 80 &&
     state.persona !== null;
 
   useEffect(() => {
@@ -106,20 +108,78 @@ export default function Step1PersonaSelect({ state, updateState }: Props) {
   }, [isFormValid, updateState]);
 
   return (
-    <div 
+    <div
       className={`w-full transition-all duration-[300ms] ease-in-out ${
         animateIn ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
       }`}
     >
+      {/* ── FRONT-LOADED LANGUAGE SELECTOR ─────────────────────────────────────
+          Displayed at the very top of the card, before any biographical inputs.
+          Selecting a language immediately applies i18next.changeLanguage() so all
+          translated strings update in real time. The chosen locale is bound to
+          state.locale and will be passed to POST /api/ledger/init when the session
+          is created on persona commit.
+      ─────────────────────────────────────────────────────────────────────────── */}
+      <div className="mb-7">
+        <p className="font-sans text-[11px] text-[#555] uppercase tracking-[0.18em] mb-3">
+          {state.locale === 'es' ? 'Selecciona tu idioma' : 'Select your language'}
+        </p>
+        <div className="flex gap-3 w-full">
+          <button
+            onClick={() => handleLocaleSelect('en')}
+            className={`
+              flex-1 flex items-center justify-center gap-2.5 py-3.5 rounded-[var(--border-radius-card)]
+              font-sans font-bold text-[14px] tracking-[0.08em] uppercase
+              transition-all duration-200 outline-none
+              focus-visible:ring-2 focus-visible:ring-[var(--gold-primary)]
+              active:scale-[0.98]
+              ${state.locale === 'en'
+                ? 'bg-[var(--gold-primary)] text-[#121212] shadow-[0_0_14px_rgba(212,175,55,0.3)]'
+                : 'bg-[var(--bg-card)] border border-[var(--border-default)] text-[#888888] hover:border-[var(--gold-secondary)] hover:text-white'
+              }
+            `}
+          >
+            {/* US flag emoji as a lightweight, no-dependency locale indicator */}
+            <span className="text-[18px] leading-none">🇺🇸</span>
+            English
+          </button>
+          <button
+            onClick={() => handleLocaleSelect('es')}
+            className={`
+              flex-1 flex items-center justify-center gap-2.5 py-3.5 rounded-[var(--border-radius-card)]
+              font-sans font-bold text-[14px] tracking-[0.08em] uppercase
+              transition-all duration-200 outline-none
+              focus-visible:ring-2 focus-visible:ring-[var(--gold-primary)]
+              active:scale-[0.98]
+              ${state.locale === 'es'
+                ? 'bg-[var(--gold-primary)] text-[#121212] shadow-[0_0_14px_rgba(212,175,55,0.3)]'
+                : 'bg-[var(--bg-card)] border border-[var(--border-default)] text-[#888888] hover:border-[var(--gold-secondary)] hover:text-white'
+              }
+            `}
+          >
+            <span className="text-[18px] leading-none">🇪🇸</span>
+            Español
+          </button>
+        </div>
+      </div>
+
+      {/* Divider between language selector and biometric form */}
+      <div className="w-full h-[1px] bg-[#1e1e1e] mb-7" />
+
+      {/* ── BIOMETRIC INPUTS ─────────────────────────────────────────────────── */}
       <div className="mb-8">
-        <h2 className="font-bebas text-[18px] md:text-xl mb-4 tracking-wide text-white uppercase">{t('step1.title')}</h2>
+        <h2 className="font-bebas text-[18px] md:text-xl mb-4 tracking-wide text-white uppercase">
+          {t('step1.title')}
+        </h2>
         <div className="grid grid-cols-2 gap-4">
           <div className="flex flex-col">
-            <label htmlFor="sex-select" className="font-sans font-semibold text-[13px] text-[#888888] uppercase tracking-[0.1em] mb-2">{t('step1.sexLabel')}</label>
+            <label htmlFor="sex-select" className="font-sans font-semibold text-[13px] text-[#888888] uppercase tracking-[0.1em] mb-2">
+              {t('step1.sexLabel')}
+            </label>
             <div className="relative">
-              <select 
+              <select
                 id="sex-select"
-                value={state.sex || ''} 
+                value={state.sex || ''}
                 onChange={(e) => updateState({ sex: e.target.value as 'male' | 'female' })}
                 className="w-full appearance-none bg-[var(--bg-card)] border border-[var(--border-default)] focus:border-[var(--border-selected)] text-white rounded-[var(--border-radius-input)] px-4 py-3 outline-none font-sans transition-colors cursor-pointer"
               >
@@ -135,10 +195,12 @@ export default function Step1PersonaSelect({ state, updateState }: Props) {
             </div>
           </div>
           <div className="flex flex-col">
-            <label htmlFor="age-input" className="font-sans font-semibold text-[13px] text-[#888888] uppercase tracking-[0.1em] mb-2">{t('step1.ageLabel')}</label>
-            <input 
+            <label htmlFor="age-input" className="font-sans font-semibold text-[13px] text-[#888888] uppercase tracking-[0.1em] mb-2">
+              {t('step1.ageLabel')}
+            </label>
+            <input
               id="age-input"
-              type="number" 
+              type="number"
               placeholder="--"
               value={state.age || ''}
               onChange={(e) => updateState({ age: e.target.value ? parseInt(e.target.value, 10) : null })}
@@ -151,8 +213,9 @@ export default function Step1PersonaSelect({ state, updateState }: Props) {
         )}
       </div>
 
-      <div className="w-full h-[1px] bg-[#2e2e2e] mb-8"></div>
+      <div className="w-full h-[1px] bg-[#2e2e2e] mb-8" />
 
+      {/* ── PERSONA TILES ─────────────────────────────────────────────────────── */}
       <div className="mb-6">
         <h2 className="font-bebas text-2xl tracking-wide text-white mb-1">{t('step1.whoAreYou')}</h2>
         <p className="font-sans text-[15px] text-[#888888]">{t('step1.whoAreYouDesc')}</p>
@@ -172,9 +235,12 @@ export default function Step1PersonaSelect({ state, updateState }: Props) {
                 }
               }}
               className={`
-                flex flex-col items-start p-5 rounded-[var(--border-radius-card)] text-left transition-all duration-[200ms] ease-in-out outline-none focus-visible:ring-2 focus-visible:ring-[var(--gold-primary)]
-                ${isSelected 
-                  ? 'bg-[var(--bg-card-selected)] border-2 border-[var(--gold-primary)] shadow-[0_0_12px_rgba(212,175,55,0.25)]' 
+                flex flex-col items-start p-5 rounded-[var(--border-radius-card)]
+                text-left transition-all duration-[200ms] ease-in-out outline-none
+                focus-visible:ring-2 focus-visible:ring-[var(--gold-primary)]
+                active:scale-[0.98]
+                ${isSelected
+                  ? 'bg-[var(--bg-card-selected)] border-2 border-[var(--gold-primary)] shadow-[0_0_12px_rgba(212,175,55,0.25)]'
                   : 'bg-[var(--bg-card)] border border-[var(--border-default)] hover:bg-[var(--bg-card-hover)] hover:border-[var(--gold-secondary)]'
                 }
               `}
@@ -184,7 +250,11 @@ export default function Step1PersonaSelect({ state, updateState }: Props) {
               <div className={`mb-3 ${isSelected ? 'text-[var(--gold-primary)]' : 'text-[#888888]'}`}>
                 {p.icon}
               </div>
-              <h3 className="font-bebas text-xl text-white tracking-wide uppercase mb-1">{p.label}</h3>
+              <h3 className={`font-bebas text-xl tracking-wide uppercase mb-1 ${
+                isSelected ? 'text-[var(--gold-primary)]' : 'text-white'
+              }`}>
+                {p.label}
+              </h3>
               <p className="font-sans text-[13px] text-[#888888] leading-snug">{p.desc}</p>
             </button>
           );
@@ -195,9 +265,10 @@ export default function Step1PersonaSelect({ state, updateState }: Props) {
         disabled={!isFormValid}
         onClick={() => updateState({ currentStep: 2 })}
         className={`
-          w-full py-4 rounded-[var(--border-radius-input)] font-sans font-bold uppercase tracking-[0.15em] text-[15px] transition-all duration-200
-          ${isFormValid 
-            ? 'bg-[var(--gold-primary)] text-[#121212] hover:bg-[var(--gold-secondary)] hover:-translate-y-[1px] shadow-[0_4px_12px_rgba(212,175,55,0.2)]' 
+          w-full py-4 rounded-[var(--border-radius-input)] font-sans font-bold
+          uppercase tracking-[0.15em] text-[15px] transition-all duration-200
+          ${isFormValid
+            ? 'bg-[var(--gold-primary)] text-[#121212] hover:bg-[var(--gold-secondary)] hover:-translate-y-[1px] shadow-[0_4px_12px_rgba(212,175,55,0.2)]'
             : 'bg-[var(--bg-card)] text-[var(--text-dim)] pointer-events-none'
           }
         `}

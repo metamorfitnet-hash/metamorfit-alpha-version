@@ -14,4 +14,5 @@ export interface OnboardingState {
   bodyFatEnabled: boolean;
   bodyFatPercent: number | null;
   somatotypeTweakEnabled: boolean;
+  email: string | null;  // Lead capture — required before finalize
 }

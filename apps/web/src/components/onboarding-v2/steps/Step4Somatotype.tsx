@@ -40,11 +40,12 @@ export default function Step4Somatotype({ state, updateState }: Props) {
     return () => clearTimeout(timer);
   }, []);
 
+  // Step 4: Selection updates highlight only — NO auto-advance.
+  // The explicit Continue button is the only path forward.
   const handleSomatoClick = (typeId: OnboardingState['somatotype']) => {
     updateState({ somatotype: typeId });
-    setTimeout(() => {
-      updateState({ currentStep: 5 });
-    }, 400);
+    // NOTE: auto-advance (setTimeout → currentStep: 5) deliberately removed
+    // per lead magnet UX spec — user must tap the Continue button.
   };
 
   const isFormValid = state.somatotype !== null;
@@ -61,16 +62,20 @@ export default function Step4Somatotype({ state, updateState }: Props) {
   }, [isFormValid, updateState]);
 
   return (
-    <div 
+    <div
       className={`w-full transition-all duration-[300ms] ease-in-out ${
         animateIn ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
       }`}
     >
+      {/* Header */}
       <div className="mb-6">
-        <h2 className="font-bebas text-[18px] md:text-xl tracking-wide text-white mb-1 uppercase">{t('step4.title')}</h2>
+        <h2 className="font-bebas text-[22px] md:text-2xl tracking-wide text-white mb-1 uppercase">
+          {t('step4.title')}
+        </h2>
         <p className="font-sans text-[15px] text-[#888888]">{t('step4.desc')}</p>
       </div>
 
+      {/* Full-bleed tile column on mobile, 3-col on md+ */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         {SOMATOTYPE_IDS.map((id) => {
           const isSelected = state.somatotype === id;
@@ -85,19 +90,24 @@ export default function Step4Somatotype({ state, updateState }: Props) {
                 }
               }}
               className={`
-                flex flex-col items-center p-6 rounded-[var(--border-radius-card)] text-center transition-all duration-[200ms] ease-in-out outline-none focus-visible:ring-2 focus-visible:ring-[var(--gold-primary)]
-                ${isSelected 
-                  ? 'bg-[var(--bg-card-selected)] border-2 border-[var(--gold-primary)] shadow-[0_0_12px_rgba(212,175,55,0.25)] scale-[1.02]' 
+                flex flex-col items-center p-6 rounded-[var(--border-radius-card)]
+                text-center transition-all duration-[200ms] ease-in-out outline-none
+                focus-visible:ring-2 focus-visible:ring-[var(--gold-primary)]
+                w-full min-h-[140px] active:scale-[0.98]
+                ${isSelected
+                  ? 'bg-[var(--bg-card-selected)] border-2 border-[var(--gold-primary)] shadow-[0_0_16px_rgba(212,175,55,0.28)] scale-[1.01]'
                   : 'bg-[var(--bg-card)] border border-[var(--border-default)] hover:bg-[var(--bg-card-hover)] hover:border-[var(--gold-secondary)]'
                 }
               `}
               role="button"
               tabIndex={0}
             >
-              <div className={`mb-5 ${isSelected ? 'text-[var(--gold-primary)]' : 'text-[#888888]'}`}>
+              <div className={`mb-4 ${isSelected ? 'text-[var(--gold-primary)]' : 'text-[#888888]'}`}>
                 {SOMATOTYPE_ICONS[id]}
               </div>
-              <h3 className="font-bebas text-[22px] text-white tracking-wide uppercase mb-3">
+              <h3 className={`font-bebas text-[22px] tracking-wide uppercase mb-2 ${
+                isSelected ? 'text-[var(--gold-primary)]' : 'text-white'
+              }`}>
                 {t(`step4.somatotypes.${id}.label`)}
               </h3>
               <p className="font-sans text-[13px] text-[#888888] leading-[1.6]">
@@ -108,13 +118,15 @@ export default function Step4Somatotype({ state, updateState }: Props) {
         })}
       </div>
 
+      {/* Explicit Continue button — the sole route forward */}
       <button
         disabled={!isFormValid}
         onClick={() => updateState({ currentStep: 5 })}
         className={`
-          w-full py-4 rounded-[var(--border-radius-input)] font-sans font-bold uppercase tracking-[0.15em] text-[15px] transition-all duration-200
-          ${isFormValid 
-            ? 'bg-[var(--gold-primary)] text-[#121212] hover:bg-[var(--gold-secondary)] hover:-translate-y-[1px] shadow-[0_4px_12px_rgba(212,175,55,0.2)]' 
+          w-full py-4 rounded-[var(--border-radius-input)] font-sans font-bold
+          uppercase tracking-[0.15em] text-[15px] transition-all duration-200
+          ${isFormValid
+            ? 'bg-[var(--gold-primary)] text-[#121212] hover:bg-[var(--gold-secondary)] hover:-translate-y-[1px] shadow-[0_4px_12px_rgba(212,175,55,0.2)]'
             : 'bg-[var(--bg-card)] text-[var(--text-dim)] pointer-events-none'
           }
         `}

@@ -200,6 +200,7 @@ export async function renderMetamorfitPdf(rawPayload: RenderPayload, env?: any):
   formData.append('marginBottom', '0');
   formData.append('marginLeft', '0');
   formData.append('marginRight', '0');
+  formData.append('waitDelay', '2s'); // Mandatory wait to allow CSS/layout hydration
 
   console.log('[Worker/Renderer] Calling Gotenberg at', gotenbergUrl);
   console.log('[Worker/Renderer] HTML length:', fullHtml.length);

@@ -54,12 +54,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${bebas.variable} ${dmSans.variable}`}>
       <body className="antialiased bg-[#050505] text-[#e8e2d5] font-body" suppressHydrationWarning>
-        <div className="fixed top-0 left-0 w-full bg-amber-500 text-black font-bold text-center py-2 z-[9999] text-sm md:text-base shadow-md">
-          ⚠️ ALPHA DEVELOPMENT ENVIRONMENT — LOCAL SANDBOX ⚠️
-        </div>
-        <div className="pt-10">
-          {children}
-        </div>
+        {children}
       </body>
     </html>
   );

@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { OnboardingState } from '../types';
-import PrecisionToggle from '../PrecisionToggle';
 
 interface Props {
   state: OnboardingState;
@@ -10,92 +9,212 @@ interface Props {
   isCalibrating: boolean;
 }
 
+// Simple email format guard
+const isValidEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
+
 export default function Step6Calibrate({ state, updateState, onCalibrate, isCalibrating }: Props) {
   const { t } = useTranslation();
   const [animateIn, setAnimateIn] = useState(false);
+  const [emailInput, setEmailInput] = useState(state.email || '');
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [isFocused, setIsFocused] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const isEs = state.locale === 'es';
 
   useEffect(() => {
     const timer = setTimeout(() => setAnimateIn(true), 50);
     return () => clearTimeout(timer);
   }, []);
 
+  // Focus the email field as soon as the step mounts — zero friction
   useEffect(() => {
-    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+    const focusTimer = setTimeout(() => inputRef.current?.focus(), 350);
+    return () => clearTimeout(focusTimer);
+  }, []);
+
+  // ── SUBMISSION HANDSHAKE ────────────────────────────────────────────────────
+  // 1. Validate email format locally
+  // 2. PATCH email into the MM_LEDGER via saveStep (inside updateState) so the
+  //    worker has it when it reads the ledger entry during finalize
+  // 3. Call onCalibrate() → handleCalibrate() in OnboardingContainer →
+  //    POST /api/ledger/:userId/finalize → Gotenberg → R2 → Brevo pipeline
+  const handleSubmit = async () => {
+    const trimmed = emailInput.trim();
+    if (!trimmed || !isValidEmail(trimmed)) {
+      setEmailError(
+        isEs
+          ? 'Por favor, introduce una dirección de correo válida.'
+          : 'Please enter a valid email address.'
+      );
+      inputRef.current?.focus();
+      return;
+    }
+    setEmailError(null);
+
+    // Patch email into ledger before finalize fires
+    await updateState({ email: trimmed });
+
+    // Trigger the finalization pipeline
+    onCalibrate();
+  };
+
+  // Allow Enter key to submit
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Enter' && !isCalibrating) {
         e.preventDefault();
-        onCalibrate();
+        handleSubmit();
       }
     };
-    window.addEventListener('keydown', handleGlobalKeyDown);
-    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
-  }, [isCalibrating, onCalibrate]);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isCalibrating, emailInput]);
+
+  const formValid = isValidEmail(emailInput.trim());
 
   return (
-    <div 
+    <div
       className={`w-full transition-all duration-[300ms] ease-in-out ${
         animateIn ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
       }`}
     >
-      <div className="mb-6">
-        <h2 className="font-bebas text-[18px] md:text-xl tracking-wide text-white mb-1 uppercase">{t('step6.title')}</h2>
-        <p className="font-sans text-[15px] text-[#888888]">{t('step6.desc')}</p>
-      </div>
-
-      <div className="flex flex-col gap-4 mb-8">
-        <PrecisionToggle
-          label={t('step6.bodyFatLabel')}
-          sublabel={t('step6.bodyFatSublabel')}
-          checked={state.bodyFatEnabled}
-          onChange={(checked) => updateState({ bodyFatEnabled: checked })}
-        />
-        
-        <div 
-          className={`overflow-hidden transition-all duration-200 ease-in-out ${
-            state.bodyFatEnabled ? 'max-h-[120px] opacity-100 mb-2' : 'max-h-0 opacity-0 m-0'
-          }`}
-        >
-          <div className="flex flex-col pt-2">
-            <div className="relative w-full max-w-[200px]">
-              <input 
-                type="number" 
-                placeholder="--"
-                value={state.bodyFatPercent || ''}
-                onChange={(e) => updateState({ bodyFatPercent: e.target.value ? parseInt(e.target.value, 10) : null })}
-                className="w-full bg-[var(--bg-card)] border border-[var(--border-default)] focus:border-[var(--border-selected)] text-white rounded-[var(--border-radius-input)] px-4 py-3 outline-none font-sans transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-              />
-              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[#888888] font-sans text-[13px] font-semibold">%</span>
-            </div>
-            <p className="text-[#888888] font-sans text-[12px] mt-2 italic">
-              {t('step6.bodyFatHint')}
-            </p>
-          </div>
+      {/* ── VALUE PROPOSITION HEADER ─────────────────────────────────────────── */}
+      <div className="mb-8 text-center">
+        {/* Gold accent line */}
+        <div className="flex items-center justify-center gap-3 mb-5">
+          <div className="h-[1px] w-10 bg-[var(--gold-primary)]" />
+          <span className="font-bebas text-[var(--gold-primary)] text-[11px] tracking-[0.3em] uppercase">
+            {isEs ? 'Último paso' : 'Final step'}
+          </span>
+          <div className="h-[1px] w-10 bg-[var(--gold-primary)]" />
         </div>
 
-        <PrecisionToggle
-          label={t('step6.somatotypeTweakLabel')}
-          sublabel={t('step6.somatotypeTweakSublabel')}
-          checked={state.somatotypeTweakEnabled}
-          onChange={(checked) => updateState({ somatotypeTweakEnabled: checked })}
-        />
+        <h2 className="font-bebas text-[28px] md:text-[32px] tracking-wide text-white uppercase leading-tight mb-3">
+          {isEs
+            ? 'Tu manual de transformación está listo.'
+            : 'Your transformation manual is ready.'}
+        </h2>
+
+        <p className="font-sans text-[15px] text-[#888888] leading-relaxed max-w-[420px] mx-auto">
+          {isEs
+            ? 'Tu plan personalizado de ganancia muscular, analizado por IA y calibrado específicamente para tu fisiología de hardgainer, se está compilando ahora mismo y será enviado directamente a tu bandeja de entrada.'
+            : 'Your personalized muscle-building plan — AI-analyzed and calibrated specifically for your hardgainer physiology — is being compiled right now and will be routed directly to your inbox.'}
+        </p>
       </div>
 
+      {/* ── WHAT THEY RECEIVE ─────────────────────────────────────────────────── */}
+      <div className="bg-[var(--bg-card)] border border-[var(--border-default)] rounded-[var(--border-radius-card)] px-5 py-4 mb-8">
+        <p className="font-sans text-[11px] text-[var(--gold-primary)] uppercase tracking-[0.2em] mb-3">
+          {isEs ? 'Lo que recibirás' : "What you'll receive"}
+        </p>
+        <ul className="flex flex-col gap-2">
+          {(isEs
+            ? [
+                'Tu objetivo calórico preciso y división de macros',
+                'Estrategia de proteínas calibrada para tu metabolismo ectomorfo',
+                'Contexto de IA sobre por qué este plan funciona para ti',
+                'Documento PDF completo y premium entregado en minutos',
+              ]
+            : [
+                'Your precise caloric target and macro split',
+                'Protein strategy calibrated for your ectomorph metabolism',
+                'AI context on exactly why this plan works for your body',
+                'Full premium PDF document delivered within minutes',
+              ]
+          ).map((item, i) => (
+            <li key={i} className="flex items-start gap-2.5 font-sans text-[13px] text-[#cccccc]">
+              <span className="text-[var(--gold-primary)] mt-[1px] shrink-0">✓</span>
+              {item}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* ── EMAIL CAPTURE ─────────────────────────────────────────────────────── */}
+      <div className="mb-6">
+        <label
+          htmlFor="lead-email"
+          className="font-sans font-semibold text-[12px] text-[#888888] uppercase tracking-[0.14em] mb-2 block"
+        >
+          {isEs ? 'Correo electrónico' : 'Email address'}
+        </label>
+
+        <div
+          className={`relative w-full rounded-[var(--border-radius-input)] border transition-all duration-200 ${
+            emailError
+              ? 'border-[#e05252] shadow-[0_0_0_3px_rgba(224,82,82,0.12)]'
+              : isFocused
+              ? 'border-[var(--gold-primary)] shadow-[0_0_0_3px_rgba(212,175,55,0.12)]'
+              : 'border-[var(--border-default)]'
+          }`}
+        >
+          <input
+            ref={inputRef}
+            id="lead-email"
+            type="email"
+            inputMode="email"
+            autoComplete="email"
+            placeholder={isEs ? 'tu@correo.com' : 'you@email.com'}
+            value={emailInput}
+            disabled={isCalibrating}
+            onChange={(e) => {
+              setEmailInput(e.target.value);
+              if (emailError) setEmailError(null);
+            }}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
+            className="w-full bg-[var(--bg-card)] text-white rounded-[var(--border-radius-input)] px-4 py-4 outline-none font-sans text-[15px] placeholder:text-[#444] disabled:opacity-50 transition-colors"
+          />
+          {/* Checkmark appears when email is valid */}
+          {formValid && !isCalibrating && (
+            <div className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--gold-primary)] text-[16px]">
+              ✓
+            </div>
+          )}
+        </div>
+
+        {emailError && (
+          <p className="text-[#e05252] font-sans text-[12px] mt-1.5">{emailError}</p>
+        )}
+
+        <p className="font-sans text-[11px] text-[#555] mt-2 leading-relaxed">
+          {isEs
+            ? 'Sin spam. Solo tu plan de transformación. Cancelar en cualquier momento.'
+            : 'No spam. Just your transformation plan. Unsubscribe anytime.'}
+        </p>
+      </div>
+
+      {/* ── SUBMIT CTA ─────────────────────────────────────────────────────────── */}
       <button
-        disabled={isCalibrating}
-        onClick={onCalibrate}
+        id="lead-capture-submit"
+        disabled={isCalibrating || !formValid}
+        onClick={handleSubmit}
         className={`
-          w-full py-4 rounded-[var(--border-radius-input)] font-bebas text-[18px] tracking-[0.1em] transition-all duration-200 flex items-center justify-center
-          ${isCalibrating 
-            ? 'bg-[var(--gold-secondary)] text-[#121212]' 
-            : 'bg-[var(--gold-primary)] text-[#121212] hover:bg-[var(--gold-secondary)] hover:scale-[1.01]'
+          w-full py-4 rounded-[var(--border-radius-input)] font-bebas text-[20px]
+          tracking-[0.1em] transition-all duration-200 flex items-center justify-center gap-3
+          ${isCalibrating
+            ? 'bg-[var(--gold-secondary)] text-[#121212] cursor-wait'
+            : formValid
+            ? 'bg-[var(--gold-primary)] text-[#121212] hover:bg-[var(--gold-secondary)] hover:scale-[1.01] shadow-[0_4px_16px_rgba(212,175,55,0.25)]'
+            : 'bg-[var(--bg-card)] text-[var(--text-dim)] border border-[var(--border-default)] pointer-events-none'
           }
         `}
       >
         {isCalibrating ? (
           <span className="animate-pulse flex items-center gap-2">
-            <span className="text-[12px]">⬤</span> {t('step6.calibratingBtn')}
+            <span className="inline-block w-2 h-2 rounded-full bg-[#121212] animate-bounce [animation-delay:0ms]" />
+            <span className="inline-block w-2 h-2 rounded-full bg-[#121212] animate-bounce [animation-delay:150ms]" />
+            <span className="inline-block w-2 h-2 rounded-full bg-[#121212] animate-bounce [animation-delay:300ms]" />
+            <span className="ml-1">
+              {isEs ? 'Compilando tu plan...' : 'Compiling your plan...'}
+            </span>
           </span>
         ) : (
-          t('step6.calibrateBtn')
+          <>
+            <span>{isEs ? 'Enviar mi plan' : 'Send my plan'}</span>
+            <span className="text-[18px]">→</span>
+          </>
         )}
       </button>
     </div>

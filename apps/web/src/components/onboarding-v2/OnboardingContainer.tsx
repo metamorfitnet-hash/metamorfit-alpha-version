@@ -37,6 +37,7 @@ export default function OnboardingContainer() {
     bodyFatEnabled: false,
     bodyFatPercent: null,
     somatotypeTweakEnabled: false,
+    email: null,
   });
 
   // Sync session data to local state if recovered
@@ -80,8 +81,8 @@ export default function OnboardingContainer() {
       if (ledger?.userId) {
         await saveStep(updates);
       } else if (state.currentStep === 1 && updates.persona) {
-        // Init session on first interaction
-        await initSession();
+        // Init session on first interaction — pass current locale to seed the KV ledger
+        await initSession(state.locale);
         await saveStep({ ...state, ...updates });
       }
     } catch (err) {
