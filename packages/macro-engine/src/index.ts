@@ -73,9 +73,10 @@ CRITICAL RULES:
     // Log the raw response shape for diagnostics (visible in Cloudflare real-time logs).
     console.log('[Macro Engine] Raw AI response:', JSON.stringify(aiResponse));
 
-    // Responses API returns: { output: [{ content: [{ text: "..." }] }] }
+    // Responses API returns an array which may include a 'reasoning' block first. Find the actual message block.
+    const messageOutput = aiResponse?.output?.find((o: any) => o.type === 'message' || o.role === 'assistant') || aiResponse?.output?.[0];
     const rawResponse =
-      aiResponse?.output?.[0]?.content?.[0]?.text ||   // Responses API shape
+      messageOutput?.content?.[0]?.text ||              // Responses API shape (skipping reasoning)
       aiResponse?.choices?.[0]?.message?.content ||     // fallback: Chat Completions shape
       aiResponse?.response ||                           // fallback: simple string wrapper
       "";
