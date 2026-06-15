@@ -55,7 +55,8 @@ export default Sentry.withSentry(
 		async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
 			const allowedOrigins = ['https://metamorfit.online', 'http://localhost:3000'];
 			const origin = request.headers.get('Origin');
-			const corsOrigin = (origin && allowedOrigins.includes(origin)) ? origin : 'https://metamorfit.online';
+			const isVercelPreview = origin && origin.endsWith('.vercel.app');
+			const corsOrigin = (origin && (allowedOrigins.includes(origin) || isVercelPreview)) ? origin : 'https://metamorfit.online';
 
 			const corsHeaders = {
 				"Access-Control-Allow-Origin": corsOrigin,
