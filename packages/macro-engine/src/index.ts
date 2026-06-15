@@ -186,19 +186,25 @@ app.post('/api/estimate-macros', async (c) => {
     let result = existingMacros;
 
     if (!result) {
+      const instructions = `You are a precise sports nutritionist. Estimate macros for the requested meal. 
+You must respond with ONLY a valid JSON object matching the schema: {"calories": number, "protein": number, "carbs": number, "fats": number}. 
+Do not include markdown code blocks, explanation, or extra conversational text. The user may log food inputs in English or Spanish. 
+If locale is '${locale}' and it is 'es', return the food item names and breakdown descriptions in Spanish, but strictly preserve the numerical macro estimation values and the English JSON structure.
+Wrap your final JSON output strictly inside [START] and [END] tags. Any reasoning must happen outside these tags.`;
+
       const aiResponse: any = await c.env.AI.run("@cf/openai/gpt-oss-120b", { 
-        messages: [
-          { role: 'system', content: `You are a precise sports nutritionist. Estimate macros for the requested meal. You must respond with ONLY a valid JSON object matching the schema: {"calories": number, "protein": number, "carbs": number, "fats": number}. Do not include markdown code blocks, explanation, or extra conversational text. The user may log food inputs in English or Spanish. If locale is '${locale}' and it is 'es', return the food item names and breakdown descriptions in Spanish, but strictly preserve the numerical macro estimation values and the English JSON structure.` },
-          { role: 'user', content: `Estimate macros for: "${normalized}"` }
-        ],
-        temperature: 0.2,
-        max_tokens: 1000,
-        response_format: { type: "json_object" }
+        instructions,
+        input: `Estimate macros for: "${normalized}"`
       });
 
-      let raw = aiResponse?.choices?.[0]?.message?.content || "";
+      const messageOutput = aiResponse?.output?.find((o: any) => o.type === 'message' || o.role === 'assistant') || aiResponse?.output?.[0];
+      let raw = messageOutput?.content?.[0]?.text || aiResponse?.choices?.[0]?.message?.content || aiResponse?.response || "";
+      
+      const match = raw.match(/\[START\]([\s\S]*?)\[END\]/);
+      if (match) raw = match[1].trim();
+      else raw = raw.trim();
+
       if (typeof raw === 'string') {
-        raw = raw.trim();
         if (raw.startsWith("```json")) raw = raw.replace(/```json/gi, "").replace(/```/g, "").trim();
         else if (raw.startsWith("```")) raw = raw.replace(/```/g, "").trim();
         const jsonMatch = raw.match(/\{[\s\S]*\}/);
@@ -221,16 +227,22 @@ app.post('/api/estimate-macros', async (c) => {
       Keep it supportive and professional. No JSON, just plain text.
       CRITICAL: Write your short meal feedback paragraph entirely in Spanish if locale is '${locale}' and it is 'es'. Keep structural schema flags in English.`;
       
+      const insightInstructions = `You are a supportive, high-performance metabolic coach. Write a 1-2 sentence supportive, professional observation in plain text.
+Wrap your final text strictly inside [START] and [END] tags. Any reasoning must happen outside these tags.`;
+      
       const insightResponse: any = await c.env.AI.run("@cf/openai/gpt-oss-120b", { 
-        messages: [
-          { role: 'system', content: 'You are a supportive, high-performance metabolic coach. Write a 1-2 sentence supportive, professional observation in plain text.' },
-          { role: 'user', content: insightPrompt }
-        ],
-        temperature: 0.4,
-        max_tokens: 1000
+        instructions: insightInstructions,
+        input: insightPrompt
       });
-      if (insightResponse?.choices?.[0]?.message?.content) {
-        explanation = insightResponse.choices[0].message.content.trim();
+
+      const messageOutput = insightResponse?.output?.find((o: any) => o.type === 'message' || o.role === 'assistant') || insightResponse?.output?.[0];
+      let rawInsight = messageOutput?.content?.[0]?.text || insightResponse?.choices?.[0]?.message?.content || insightResponse?.response || "";
+      
+      const match = rawInsight.match(/\[START\]([\s\S]*?)\[END\]/);
+      if (match) {
+        explanation = match[1].trim();
+      } else if (rawInsight.trim()) {
+        explanation = rawInsight.trim();
       }
     } catch (e) {
       console.error('Meal AI Insight failed:', e);
