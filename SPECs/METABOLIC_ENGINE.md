@@ -1,6 +1,6 @@
 # Metabolic Engine Technical Specification
 
-This document serves as the strict technical specification for our metabolic logic and meal planning engine, ensuring future AI sessions do not hallucinate or break our calculation rules.
+This document serves as the strict technical specification for our metabolic logic and meal planning engine, ensuring future AI sessions do not hallucinate or break our calculation rules. The engine's core logic is tailored strictly for the "hardgainer" and "skinny guy" demographics. All nutritional, caloric surplus calculations, and muscle-building training logic must be explicitly framed around this niche's specific metabolic and hypertrophy needs.
 
 ## 1. CORE DETERMINISTIC FORMULAS
 
@@ -58,7 +58,7 @@ The AI engine supplements the metabolic formulas by providing personalized, cont
   "paragraph3": "string (Focus on adherence and a supportive closing)"
 }
 ```
-*Note: The AI's job is to EXPLAIN the deterministic results. It is never permitted to modify or guess macro/calorie targets.*
+*Note: The AI's job is to EXPLAIN the deterministic results, specifically contextualizing them for a hardgainer's metabolism and muscle-building journey. It is never permitted to modify or guess macro/calorie targets.*
 
 ## 4. EXECUTION CONSTRAINTS
 

@@ -20,7 +20,7 @@ Our exact edge architecture is built on the following stack:
 - **State Management:** Cloudflare KV (`MEAL_CACHE`, `JOB_STATUS`, `MM_LEDGER`), Cloudflare D1 (`METAMORFIT_DB`)
 - **AI Processing:** Cloudflare AI bindings
 - **PDF & Email Delivery Pipeline:** 
-  1. **Gotenberg** (running on Fly.io) generates PDFs.
+  1. **Gotenberg** (running on Google Cloud Run) generates PDFs.
   2. PDFs are stored in **Cloudflare R2** (`metamorfit-pdf-beta` bucket).
   3. **Brevo** handles email delivery of the generated assets.
 
@@ -74,4 +74,4 @@ This repository maintains a set of detailed technical specification files inside
 | [`.context/DATA_LEDGER_STORAGE.md`](.context/DATA_LEDGER_STORAGE.md) | Our Cloudflare KV namespace configuration, exact key naming conventions for `MM_LEDGER` and `JOB_STATUS`, the User Ledger entry schema, and the defensive read-modify-write strategies used to mitigate KV eventual consistency race conditions. |
 | [`.context/PIPELINE_DOCUMENT_DELIVERY.md`](.context/PIPELINE_DOCUMENT_DELIVERY.md) | The full Gotenberg → R2 → Brevo document delivery pipeline, including payload structure, R2 object key conventions, the worker-proxied download architecture, retry configurations, and per-stage error handling boundaries. |
 | [`.context/ONBOARDING_UX_FLOW.md`](.context/ONBOARDING_UX_FLOW.md) | The strict 6-step onboarding funnel sequence, what data each step collects, the mandatory manual-advance rules for Steps 2 and 5, how the `useOnboardingSession` hook maps frontend state to `MM_LEDGER` patches, and the graceful degradation error handling strategy. |
-| [`.context/LOCALIZATION_READINESS.md`](.context/LOCALIZATION_READINESS.md) | The architectural audit determining that Spanish cannot be added immediately, documenting every gap (no i18n framework, no `locale` field in the ledger schema, English-only AI prompts and PDF templates), and the complete 10-step prerequisite roadmap required before any translation work begins. |
+| [`.context/LOCALIZATION_READINESS.md`](.context/LOCALIZATION_READINESS.md) | The active technical specification of the finalized bilingual architecture. It details the i18n frontend integration, how the `locale` field persists through the `MM_LEDGER` schema, and the locale-aware AI prompting and PDF hydration pipelines that enable the platform to operate seamlessly in both English and Spanish. |

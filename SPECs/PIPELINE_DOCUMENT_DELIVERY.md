@@ -7,9 +7,9 @@ This document details the technical specification for our document generation an
 The PDF generation process converts structured JSON payloads into highly customized physical documents.
 
 - **Payload & React HTML Translation**: The worker receives a structured payload containing `Identity`, `MetabolicProfile`, `Meals`, and AI `IntelligenceNotes`. Before rendering, `normalizePayload()` standardizes values (e.g., mapping `cut` to `Fat Loss`) and filters out empty meals. The data is then rendered via `react-dom/server` (`renderToStaticMarkup`) into a sequence of static HTML pages (`Page1`, `Page2`, `NotesPage`, etc.).
-- **Gotenberg Interaction**: The final HTML blob is wrapped in a strict A4 template layout and injected into a `FormData` object. The worker makes an HTTP POST request to our Gotenberg instance (`/forms/chromium/convert/html`).
+- **Gotenberg Interaction**: The final HTML blob is wrapped in a strict A4 template layout and injected into a `FormData` object. The worker makes an HTTP POST request to our Gotenberg instance (`/forms/chromium/convert/html`) hosted on **Google Cloud Run**. This pipeline is fully operational, end-to-end verified, and orchestrates data inputs securely to generate high-fidelity, polished PDF transformation plans.
 - **Authentication**: Basic Auth (`worker:beta_render_token_491`).
-- **Resilience**: Because Gotenberg is hosted on Fly.io and is subject to cold starts, the network call is wrapped in a `withRetry` block configured for **3 retries with a 2000ms backoff**.
+- **Resilience**: Because Gotenberg is hosted on Google Cloud Run and is subject to cold starts, the network call is wrapped in a `withRetry` block configured for **3 retries with a 2000ms backoff**. We also enforce a `waitDelay: "2s"` parameter on the form payload to ensure Chromium perfectly hydrates our CSS print rules and localizations prior to snapshotting.
 
 ## 2. CLOUDFLARE R2 OBJECT STORAGE DEPLOYMENT
 

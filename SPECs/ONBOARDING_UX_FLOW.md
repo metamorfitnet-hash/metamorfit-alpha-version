@@ -1,6 +1,6 @@
 # Onboarding UX & Frontend Flow Technical Specification
 
-This document details the frontend user onboarding funnel for the Metamorfit platform. It outlines the strict step-by-step sequence, critical UX guardrails, and how the React frontend binds to our Cloudflare KV User Ledger system.
+This document details the frontend user onboarding funnel for the Metamorfit platform. It outlines the sleek, minimalist transformation flow designed for a premium user experience, including the strict step-by-step sequence, critical UX guardrails, and how the React frontend binds to our Cloudflare KV User Ledger system.
 
 ## 1. THE 6-STEP SEQUENCE MAP
 
@@ -20,7 +20,7 @@ To ensure users fully comprehend the metabolic strategies being applied to their
 > [!IMPORTANT]
 > **MANUAL ADVANCE REQUIREMENT (STEPS 2 & 5)**
 > Step 2 (Goals) and Step 5 (Activity Level) contain dense, critical physiological descriptions. **These steps must NEVER auto-advance or forward-progress automatically.** 
-> They require explicit, intentional user action (a distinct button click) to proceed, ensuring the descriptions can be fully read by the user. Do not introduce "auto-scroll" or "auto-next" logic on these steps.
+> As a deliberate UX design choice for our premium onboarding flow, they require explicit, intentional user action (a distinct button click) to proceed, ensuring users have sufficient time to read, absorb, and understand the metabolic strategies being applied to their bodies before proceeding. Do not introduce "auto-scroll" or "auto-next" logic on these steps.
 
 ## 3. FRONTEND-TO-LEDGER DATA MAPPING
 

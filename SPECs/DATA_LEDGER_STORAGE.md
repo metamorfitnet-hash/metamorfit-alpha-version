@@ -27,6 +27,7 @@ The **User Ledger** acts as a state machine that orchestrates data synchronizati
 ```json
 {
   "userId": "uuid",
+  "locale": "en | es",
   "status": "in_progress | complete",
   "currentStep": 1,
   "data": { /* Form answers are accumulated here */ },
