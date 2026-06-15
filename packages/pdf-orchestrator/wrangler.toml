@@ -5,8 +5,7 @@ compatibility_flags = ["nodejs_compat"]
 
 [vars]
 GOTENBERG_URL = "https://gotenberg-alpha-15308390055.us-central1.run.app"
-BREVO_SENDER_NAME = "Metamorfit Alpha"
-BREVO_SENDER_EMAIL = "sandbox@metamorfit.pro"
+BREVO_SENDER_EMAIL = "contact@metamorfit.pro"
 
 [[kv_namespaces]]
 binding = "MM_LEDGER"

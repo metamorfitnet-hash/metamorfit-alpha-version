@@ -116,8 +116,8 @@ export default {
           },
           body: JSON.stringify({
             sender: { 
-              name: env.BREVO_SENDER_NAME || "Metamorfit Alpha", 
-              email: env.BREVO_SENDER_EMAIL || "sandbox@metamorfit.pro" 
+              name: "Metamorfit Alpha", 
+              email: env.BREVO_SENDER_EMAIL || "contact@metamorfit.pro" 
             },
             to: [{ email: emailAddress }],
             subject: "Your Metabolic Blueprint is Ready",
