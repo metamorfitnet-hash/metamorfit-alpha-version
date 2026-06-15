@@ -8,7 +8,7 @@ export default {
       return new Response("Unauthorized Internal Handshake", { status: 401 });
     }
 
-    const { userId, results } = await request.json();
+    const { userId, locale, results } = await request.json();
 
     try {
       // 1. Daily Cap Check
@@ -25,29 +25,64 @@ export default {
       }
 
       // 2. Generate PDF via Gotenberg
+      const isEs = locale === 'es' || results.locale === 'es' || results.data?.locale === 'es';
+      const t = {
+        title: isEs ? "Plan Metabólico" : "Metabolic Blueprint",
+        dailyTarget: isEs ? "Objetivo Diario:" : "Daily Target:",
+        strategy: isEs ? "Estrategia Metabólica" : "Metabolic Strategy",
+        notes: isEs ? "Notas de Personalización" : "Personalization Notes",
+        fallbackInsight: isEs ? "El cumplimiento de estos objetivos impulsará adaptaciones fisiológicas." : "Adherence to these targets will drive physiological adaptations."
+      };
+
+      const insightsHtml = (results.results?.aiInsight || results.data?.meal_plan_logic || t.fallbackInsight)
+        .split('\n\n')
+        .map((p: string) => `<p style="margin-bottom: 12px; line-height: 1.6;">${p}</p>`)
+        .join('');
+
+      const notesHtml = (results.personalizationCards?.map((c:any) => c.description) || results.data?.personalization_notes || [])
+        .map((note: string) => `<div class="note-card"><p style="margin: 0; font-size: 12px; opacity: 0.8;">${note}</p></div>`)
+        .join('');
+
       const htmlContent = `
         <html>
-          <body style="font-family: sans-serif; background: #121212; color: white; padding: 40px;">
-            <h1 style="color: #D4AF37;">Metabolic Blueprint</h1>
+          <head>
+            <style>
+              body {
+                font-family: sans-serif;
+                background: #121212;
+                color: white;
+                padding: 40px;
+                height: auto !important;
+                overflow: visible !important;
+              }
+              .section {
+                margin-top: 20px;
+                page-break-inside: avoid;
+                break-inside: avoid;
+              }
+              .note-card {
+                border: 1px solid rgba(255,255,255,0.1);
+                padding: 15px;
+                margin-bottom: 10px;
+                border-radius: 8px;
+                page-break-inside: avoid;
+                break-inside: avoid;
+              }
+            </style>
+          </head>
+          <body>
+            <h1 style="color: #D4AF37;">${t.title}</h1>
             <p>User ID: ${userId}</p>
-            <h2>Daily Target: ${Math.round(results.results?.metrics?.targetCalories || results.data?.tdee?.target_kcal || results.data?.calories || 2000)} kcal</h2>
+            <h2>${t.dailyTarget} ${Math.round(results.results?.metrics?.targetCalories || results.data?.tdee?.target_kcal || results.data?.calories || 2000)} kcal</h2>
             
-            <div style="margin-top: 20px;">
-              <h3 style="color: #D4AF37;">Metabolic Strategy</h3>
-              ${(results.results?.aiInsight || results.data?.meal_plan_logic || "Adherence to these targets will drive physiological adaptations.")
-                  .split('\n\n')
-                  .map((p: string) => `<p style="margin-bottom: 12px; line-height: 1.6;">${p}</p>`)
-                  .join('')}
+            <div class="section">
+              <h3 style="color: #D4AF37;">${t.strategy}</h3>
+              ${insightsHtml}
             </div>
 
-            <div style="margin-top: 20px;">
-              <h3 style="color: #D4AF37;">Personalization Notes</h3>
-              ${(results.personalizationCards?.map((c:any) => c.description) || results.data?.personalization_notes || [])
-                  .map((note: string) => `
-                <div style="border: 1px solid rgba(255,255,255,0.1); padding: 15px; margin-bottom: 10px; border-radius: 8px;">
-                  <p style="margin: 0; font-size: 12px; opacity: 0.8;">${note}</p>
-                </div>
-              `).join('')}
+            <div class="section">
+              <h3 style="color: #D4AF37;">${t.notes}</h3>
+              ${notesHtml}
             </div>
           </body>
         </html>
@@ -56,6 +91,7 @@ export default {
       const formData = new FormData();
       const htmlFile = new File([htmlContent], "index.html", { type: "text/html" });
       formData.append("files", htmlFile);
+      formData.append("waitDelay", "2s");
 
       const gotenbergHeaders: Record<string, string> = {};
       if (env.GOTENBERG_SECRET) {

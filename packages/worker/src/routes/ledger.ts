@@ -276,7 +276,7 @@ export async function handleLedger(request: Request, env: any, ctx: any, corsHea
 
       // Handshake to Worker B (PDF Orchestrator)
       ctx.waitUntil(
-        fetch("https://metamorfit-pdf-workflow-alpha.metamorfitnet.workers.dev/", {
+        env.PDF_ORCHESTRATOR.fetch("https://metamorfit-pdf-workflow-alpha.metamorfitnet.workers.dev/", {
           method: "POST",
           headers: {
             "Authorization": `Bearer ${env.MM_WORKER_SECRET}`,

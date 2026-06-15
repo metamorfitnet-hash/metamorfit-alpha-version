@@ -13,6 +13,10 @@
     {
       "binding": "MACRO_ENGINE",
       "service": "metamorfit-main-engine-alpha"
+    },
+    {
+      "binding": "PDF_ORCHESTRATOR",
+      "service": "metamorfit-pdf-workflow-alpha"
     }
   ],
   "kv_namespaces": [
