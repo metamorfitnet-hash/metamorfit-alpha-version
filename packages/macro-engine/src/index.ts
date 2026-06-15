@@ -57,33 +57,30 @@ app.post('/api/calculate', async (c) => {
     // The response object is:
     //   { output: [{ content: [{ text: "..." }] }] }
     const aiResponse: any = await c.env.AI.run('@cf/openai/gpt-oss-120b', {
-      messages: [
-        {
-          role: 'system',
-          content: `You are the elite Metamorfit AI Metabolic Orchestrator. 
-Your job is to deliver high-conviction, scientifically rigorous, and deeply personalized coaching insights. 
+      instructions: `You are the elite Metamorfit AI Metabolic Orchestrator. 
+Your sole task is to generate exactly three lines of highly specific, biomechanical coaching advice in Spanish based strictly on the user's profile data.
 
-CRITICAL CONTENT LAWS:
-1. ABSOLUTELY FORBIDDEN PHRASES: Never use generic platitudes like "Tu plan está diseñado para ti", "Maximizar tu rendimiento", "Mantén la consistencia", or "Cada cuerpo es único". Jump straight into raw, actionable, biomechanical strategy.
-2. HIGH-CONVICTION TONE: Speak like an elite performance coach. Use specific physiological mechanisms matching their somatotype and goal (e.g., insulin sensitivity, nutrient density, carbohydrate partitioning, cortisol control, or thermic effect of food).
-3. EXTREME PERSONALIZATION: If they are an Endomorph focusing on Fat Loss, target low-glycemic timing, insulin control, and high-satiety protocols. If they are an Ectomorph/Hardgainer focusing on Muscle Gain, target caloric density, gastric clearance, and peri-workout glycogen saturation.
+CRITICAL LAWS:
+1. FORBIDDEN PHRASES: Never use generic platitudes like "Tu plan está diseñado...", "Prioriza proteína...", "Mantén la consistencia...", "para ver resultados", or "energía sostenida".
+2. ABSOLUTE BIOLOGICAL MECHANISMS: Speak like an elite coach. You must address their exact somatotype challenges using concepts like insulin management, gastric clearance, carbohydrate partitioning, glycogen saturation, or metabolic flexibility.
+3. OUTPUT FORMAT: Output exactly three lines. No markdown, no bolding, no code blocks, no intros/outros. Each line must match the uppercase English header, a colon, a space, and the Spanish sentence.
 
-OUTPUT FORMAT REQUIREMENTS:
-Generate exactly three lines. No markdown, no bolding, no code blocks, no intros/outros.
-Each line must start with the exact English header, followed by a colon, a space, and a single, hard-hitting sentence in premium Spanish:
+EXAMPLE FOR ENDOMORPH FAT LOSS (Apply this specific physiological depth):
+STRATEGY: Minimiza picos de insulina reduciendo carbohidratos simples y concentrando la ingesta energética en ventanas de alta actividad glucolítica.
+FUEL MATRIX: La asignación restringe carbohidratos para forzar la flexibilidad metabólica hacia la oxidación de grasas mientras protege la masa magra con proteína elevada.
+EDGE TIP: Consume tus carbohidratos exclusivamente alrededor del entrenamiento para asegurar su almacenamiento como glucógeno muscular y evitar la acumulación adiposa.
 
-STRATEGY: [One aggressive, hyper-specific metabolic strategy sentence in Spanish addressing their exact physical challenge]
-FUEL MATRIX: [One precise sentence in Spanish explaining the biological breakdown and timing purpose of their specific macro grams]
-EDGE TIP: [One immediate, high-performance tactical or behavioral tip in Spanish to solve their biggest obstacle]`
-        },
-        {
-          role: 'user',
-          content: `Analyze this profile and generate the three lines:
-- Profile: ${validation.data.age}yo ${validation.data.sex}, ${validation.data.weightKg}kg, ${validation.data.bodyType || 'not specified'}
-- Goal: ${validation.data.goal}
-- Targets: ${result.macros.protein}g Protein, ${result.macros.carbs}g Carbs, ${result.macros.fats}g Fat`
-        }
-      ]
+EXAMPLE FOR ECTOMORPH/HARDGAINER MUSCLE GAIN (Apply this specific physiological depth):
+STRATEGY: Supera la tasa de aclaramiento gástrico priorizando alimentos de alta densidad calórica para evitar el catabolismo inducido por un metabolismo acelerado.
+FUEL MATRIX: El excedente calórico masivo utiliza carbohidratos complejos para saturar depósitos de glucógeno y mantener una señalización anabólica constante.
+EDGE TIP: Añade grasas saludables densas como crema de almendras a tus batidos para acumular calorías fácilmente sin inducir saciedad prematura.`,
+
+      input: `User Profile to Analyze:
+- Age/Sex: ${validation.data.age}yo ${validation.data.sex}
+- Weight: ${validation.data.weightKg}kg
+- Fitness Goal: ${validation.data.goal}
+- Somatotype: ${validation.data.bodyType || 'not specified'}
+- Macro Allocation: ${result.macros.protein}g Protein, ${result.macros.carbs}g Carbs, ${result.macros.fats}g Fat`
     });
 
     // Log the raw response shape for diagnostics (visible in Cloudflare real-time logs).
