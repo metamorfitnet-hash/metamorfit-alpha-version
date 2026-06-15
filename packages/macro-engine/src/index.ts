@@ -56,19 +56,25 @@ app.post('/api/calculate', async (c) => {
     //   { instructions: "<system context>", input: "<user prompt>" }
     // The response object is:
     //   { output: [{ content: [{ text: "..." }] }] }
-    const systemInstructions = `You are an elite sports nutritionist AI.
-[LANGUAGE REQUIREMENT]
-The user's active language preference is: "${locale}".
-If this value is 'es', you MUST write the entire narrative analysis in fluent Spanish (Neutral/Castilian).
-However, you MUST still use the exact English section headers "STRATEGY:", "FUEL MATRIX:", and "EDGE TIP:".
-Do not use JSON or markdown formatting. Output ONLY the three headers with their corresponding text, separated by newlines.`;
+    const systemInstructions = `You are the elite Metamorfit AI Macro Engine. 
+Your sole task is to generate exactly three lines of localized advice based strictly on the user profile provided in the input.
 
-    const userInput = `Analyze a ${validation.data.age}yo ${validation.data.sex} weighing ${validation.data.weightKg}kg with a goal of ${validation.data.goal}${validation.data.bodyType ? ` and a ${validation.data.bodyType} body type` : ''}.
-Macros: ${JSON.stringify(result.macros)}.
-Return your analysis formatted EXACTLY with these three headers on separate lines:
-STRATEGY: [1 concise sentence on the overall nutritional strategy]
-FUEL MATRIX: [1 sentence on how the macro split supports the goal]
-EDGE TIP: [1 actionable short tip to accelerate progress]`;
+CRITICAL RULES:
+1. Do not talk to yourself, do not write chain-of-thought reasoning, and do not say "Let's craft" or "Let's choose".
+2. Output exactly three lines. No more, no less. No markdown formatting, no code blocks, no trailing notes.
+3. The names of the headers must be in English uppercase exactly as shown below, followed by a space, and the actual insight sentence must be written in fluent, premium ${locale === 'es' ? 'Spanish' : 'English'}.
+
+EXACT OUTPUT FORMAT REQUIRED:
+STRATEGY: [One concise, highly impactful strategy sentence in ${locale === 'es' ? 'Spanish' : 'English'} tailored to their goal and somatotype]
+FUEL MATRIX: [One concise sentence in ${locale === 'es' ? 'Spanish' : 'English'} explaining the macro distribution reasoning, tracking protein, carbs, and fats]
+EDGE TIP: [One actionable, high-performance tactical tip in ${locale === 'es' ? 'Spanish' : 'English'} to maximize results]`;
+
+    const userInput = `User Profile to Analyze:
+- Age/Sex: ${validation.data.age}yo ${validation.data.sex}
+- Weight: ${validation.data.weightKg}kg
+- Fitness Goal: ${validation.data.goal}
+- Somatotype: ${validation.data.bodyType || 'not specified'}
+- Macro Allocation: ${result.macros.protein}g Protein, ${result.macros.carbs}g Carbs, ${result.macros.fats}g Fat`;
 
     const aiResponse: any = await c.env.AI.run('@cf/openai/gpt-oss-120b', {
       instructions: systemInstructions,
