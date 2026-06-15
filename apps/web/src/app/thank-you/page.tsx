@@ -39,6 +39,7 @@ export default function ThankYouPage() {
 
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [isPolling, setIsPolling] = useState(true);
+  const [pdfFailed, setPdfFailed] = useState(false);
 
   useEffect(() => {
     const userId = localStorage.getItem('mm_uid');
@@ -51,7 +52,11 @@ export default function ThankYouPage() {
     const baseUrl = (workerUrl.endsWith('/') ? workerUrl.slice(0, -1) : workerUrl) + '/api';
     const UI_SECRET = process.env.NEXT_PUBLIC_MM_UI_SECRET || 'meta_alpha_sec_a7c2e9f1b3d8k9m_42891_abc';
 
+    let pollCount = 0;
+    const MAX_POLLS = 30; // 90 seconds max (30 x 3s)
+
     const checkStatus = async () => {
+      pollCount++;
       try {
         const res = await fetch(`${baseUrl}/ledger/${userId}`, {
           headers: {
@@ -65,11 +70,21 @@ export default function ThankYouPage() {
             setPdfUrl(data.results.pdfUrl);
             setIsPolling(false);
           } else if (data.status === 'delivered') {
-            setIsPolling(false); // PDF generated but no URL saved?
+            setIsPolling(false);
+          } else if (data.status === 'failed') {
+            // Pipeline failed — stop polling and show error state
+            setPdfFailed(true);
+            setIsPolling(false);
           }
         }
       } catch (err) {
         console.error("Error polling for PDF status:", err);
+      }
+
+      // Safety timeout: stop after MAX_POLLS regardless of status
+      if (pollCount >= MAX_POLLS) {
+        setPdfFailed(true);
+        setIsPolling(false);
       }
     };
 
@@ -201,6 +216,18 @@ export default function ThankYouPage() {
                 </svg>
                 {t('thankYou.downloadButton', 'Download Your Plan')}
               </a>
+            ) : pdfFailed ? (
+              <div className="mt-1 flex flex-col items-center gap-3">
+                <p className="font-sans text-sm text-red-400/80 max-w-xs text-center">
+                  {t('thankYou.pdfError', 'There was a problem generating your PDF. Your data is safe — please check your email or contact us.')}
+                </p>
+                <a
+                  href="mailto:engine@metamorfit.pro"
+                  className="flex items-center gap-2 px-6 py-3 border border-mm-gold/40 text-mm-gold font-sans text-sm tracking-widest uppercase transition-all duration-200 hover:border-mm-gold hover:text-mm-gold no-underline"
+                >
+                  {t('thankYou.contactSupport', 'Contact Support')}
+                </a>
+              </div>
             ) : (
               <button
                 type="button"
