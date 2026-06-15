@@ -51,30 +51,45 @@ app.post('/api/calculate', async (c) => {
     ? `STRATEGY: Tu plan está diseñado para maximizar tu rendimiento metabólico con base en tu perfil único.\nFUEL MATRIX: Prioriza proteína para preservar músculo y grasas saludables para energía sostenida.\nEDGE TIP: Mantén consistencia en tus macros durante al menos 4 semanas para ver resultados medibles.`
     : `STRATEGY: Your plan is engineered to maximise metabolic output based on your unique physiological profile.\nFUEL MATRIX: Prioritise protein to preserve lean mass and healthy fats for sustained energy output.\nEDGE TIP: Maintain macro consistency for at least 4 weeks to observe measurable body composition shifts.`;
   try {
-    const aiPrompt = `Analyze a ${validation.data.age}yo ${validation.data.sex} weighing ${validation.data.weightKg}kg with a goal of ${validation.data.goal}${validation.data.bodyType ? ` and a ${validation.data.bodyType} body type` : ""}. 
-    Macros: ${JSON.stringify(result.macros)}. 
-    Return your analysis formatted EXACTLY with these three headers:
-    STRATEGY: [1 sentence strategy]
-    FUEL MATRIX: [1 sentence on macros]
-    EDGE TIP: [1 short tip]`;
-    
-    const systemPrompt = `You are an elite sports nutritionist AI.
-   [LANGUAGE REQUIREMENT]
-   The user's active language preference is: "${locale}".
-   If this value is 'es', you MUST write the entire narrative analysis in fluent Spanish (Neutral/Castilian). 
-   However, you MUST still use the exact English headers "STRATEGY:", "FUEL MATRIX:", and "EDGE TIP:".
-   Do not use JSON or markdown. Just the headers and text.`;
-    
-    const aiResponse: any = await c.env.AI.run("@cf/openai/gpt-oss-120b", { 
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: aiPrompt }
-      ],
-      temperature: 0.4,
-      max_tokens: 150
+    // @cf/openai/gpt-oss-120b uses the OpenAI Responses API schema —
+    // NOT the Chat Completions messages[] format. The correct call shape is:
+    //   { instructions: "<system context>", input: "<user prompt>" }
+    // The response object is:
+    //   { output: [{ content: [{ text: "..." }] }] }
+    const systemInstructions = `You are an elite sports nutritionist AI.
+[LANGUAGE REQUIREMENT]
+The user's active language preference is: "${locale}".
+If this value is 'es', you MUST write the entire narrative analysis in fluent Spanish (Neutral/Castilian).
+However, you MUST still use the exact English section headers "STRATEGY:", "FUEL MATRIX:", and "EDGE TIP:".
+Do not use JSON or markdown formatting. Output ONLY the three headers with their corresponding text, separated by newlines.`;
+
+    const userInput = `Analyze a ${validation.data.age}yo ${validation.data.sex} weighing ${validation.data.weightKg}kg with a goal of ${validation.data.goal}${validation.data.bodyType ? ` and a ${validation.data.bodyType} body type` : ''}.
+Macros: ${JSON.stringify(result.macros)}.
+Return your analysis formatted EXACTLY with these three headers on separate lines:
+STRATEGY: [1 concise sentence on the overall nutritional strategy]
+FUEL MATRIX: [1 sentence on how the macro split supports the goal]
+EDGE TIP: [1 actionable short tip to accelerate progress]`;
+
+    const aiResponse: any = await c.env.AI.run('@cf/openai/gpt-oss-120b', {
+      instructions: systemInstructions,
+      input: userInput,
     });
-    if (aiResponse?.choices?.[0]?.message?.content) {
-      explanation = aiResponse.choices[0].message.content.trim();
+
+    // Log the raw response shape for diagnostics (visible in Cloudflare real-time logs).
+    console.log('[Macro Engine] Raw AI response:', JSON.stringify(aiResponse));
+
+    // Responses API returns: { output: [{ content: [{ text: "..." }] }] }
+    const responseText =
+      aiResponse?.output?.[0]?.content?.[0]?.text ||   // Responses API shape
+      aiResponse?.choices?.[0]?.message?.content ||     // fallback: Chat Completions shape
+      aiResponse?.response ||                           // fallback: simple string wrapper
+      null;
+
+    if (responseText && responseText.trim().length > 0) {
+      explanation = responseText.trim();
+      console.log('[Macro Engine] AI insight generated successfully.');
+    } else {
+      console.warn('[Macro Engine] AI returned an empty or unrecognised response shape. Using structured fallback.');
     }
   } catch (e: any) {
     // Log full error details so we can diagnose gpt-oss-120b binding failures in Cloudflare logs.
