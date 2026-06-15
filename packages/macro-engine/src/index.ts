@@ -56,29 +56,30 @@ app.post('/api/calculate', async (c) => {
     //   { instructions: "<system context>", input: "<user prompt>" }
     // The response object is:
     //   { output: [{ content: [{ text: "..." }] }] }
-    const systemInstructions = `You are the elite Metamorfit AI Macro Engine. 
-Your sole task is to generate exactly three lines of localized advice based strictly on the user profile provided in the input.
-
-CRITICAL RULES:
-1. Do not talk to yourself, do not write chain-of-thought reasoning, and do not say "Let's craft" or "Let's choose".
-2. Output exactly three lines. No more, no less. No markdown formatting, no code blocks, no trailing notes.
-3. The names of the headers must be in English uppercase exactly as shown below, followed by a space, and the actual insight sentence must be written in fluent, premium ${locale === 'es' ? 'Spanish' : 'English'}.
-
-EXACT OUTPUT FORMAT REQUIRED:
-STRATEGY: [One concise, highly impactful strategy sentence in ${locale === 'es' ? 'Spanish' : 'English'} tailored to their goal and somatotype]
-FUEL MATRIX: [One concise sentence in ${locale === 'es' ? 'Spanish' : 'English'} explaining the macro distribution reasoning, tracking protein, carbs, and fats]
-EDGE TIP: [One actionable, high-performance tactical tip in ${locale === 'es' ? 'Spanish' : 'English'} to maximize results]`;
-
-    const userInput = `User Profile to Analyze:
-- Age/Sex: ${validation.data.age}yo ${validation.data.sex}
-- Weight: ${validation.data.weightKg}kg
-- Fitness Goal: ${validation.data.goal}
-- Somatotype: ${validation.data.bodyType || 'not specified'}
-- Macro Allocation: ${result.macros.protein}g Protein, ${result.macros.carbs}g Carbs, ${result.macros.fats}g Fat`;
-
     const aiResponse: any = await c.env.AI.run('@cf/openai/gpt-oss-120b', {
-      instructions: systemInstructions,
-      input: userInput,
+      messages: [
+        {
+          role: 'system',
+          content: `You are the final execution engine for Metamorfit. Do not brainstorm, do not talk to yourself, and do not explain your plan. You must act as the final assistant, not a prompt designer.
+
+Generate exactly three lines of text using this exact structure:
+STRATEGY: [One concise sentence in ${locale === 'es' ? 'Spanish' : 'English'}]
+FUEL MATRIX: [One concise sentence in ${locale === 'es' ? 'Spanish' : 'English'}]
+EDGE TIP: [One actionable tip in ${locale === 'es' ? 'Spanish' : 'English'}]
+
+Strict Rules:
+- Output exactly three lines. No intro, no outro, no markdown, no code blocks.
+- Headers must be in uppercase English exactly as shown, followed by a colon and a space.
+- The insight text itself must be written in fluent, premium ${locale === 'es' ? 'Spanish' : 'English'}.`
+        },
+        {
+          role: 'user',
+          content: `Analyze this profile and generate the three lines:
+- Profile: ${validation.data.age}yo ${validation.data.sex}, ${validation.data.weightKg}kg, ${validation.data.bodyType || 'not specified'}
+- Goal: ${validation.data.goal}
+- Targets: ${result.macros.protein}g Protein, ${result.macros.carbs}g Carbs, ${result.macros.fats}g Fat`
+        }
+      ]
     });
 
     // Log the raw response shape for diagnostics (visible in Cloudflare real-time logs).
