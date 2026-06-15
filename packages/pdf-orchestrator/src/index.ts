@@ -115,7 +115,10 @@ export default {
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            sender: { name: "Metamorfit", email: "engine@metamorfit.pro" },
+            sender: { 
+              name: env.BREVO_SENDER_NAME || "Metamorfit Alpha", 
+              email: env.BREVO_SENDER_EMAIL || "sandbox@metamorfit.pro" 
+            },
             to: [{ email: emailAddress }],
             subject: "Your Metabolic Blueprint is Ready",
             textContent: `Your personalized metabolic blueprint is attached.\n\nYou can also download it here: ${pdfUrl || "Not available"}`,
