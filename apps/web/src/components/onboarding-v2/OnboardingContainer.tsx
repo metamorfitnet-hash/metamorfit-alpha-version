@@ -37,6 +37,7 @@ export default function OnboardingContainer() {
     bodyFatEnabled: false,
     bodyFatPercent: null,
     somatotypeTweakEnabled: false,
+    name: null,
     email: null,
   });
 

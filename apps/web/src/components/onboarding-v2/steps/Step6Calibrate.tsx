@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { OnboardingState } from '../types';
 
@@ -9,16 +9,9 @@ interface Props {
   isCalibrating: boolean;
 }
 
-// Simple email format guard
-const isValidEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
-
-export default function Step6Calibrate({ state, updateState, onCalibrate, isCalibrating }: Props) {
+export default function Step6Calibrate({ state, onCalibrate, isCalibrating }: Props) {
   const { t } = useTranslation();
   const [animateIn, setAnimateIn] = useState(false);
-  const [emailInput, setEmailInput] = useState(state.email || '');
-  const [emailError, setEmailError] = useState<string | null>(null);
-  const [isFocused, setIsFocused] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
 
   const isEs = state.locale === 'es';
 
@@ -27,35 +20,8 @@ export default function Step6Calibrate({ state, updateState, onCalibrate, isCali
     return () => clearTimeout(timer);
   }, []);
 
-  // Focus the email field as soon as the step mounts — zero friction
-  useEffect(() => {
-    const focusTimer = setTimeout(() => inputRef.current?.focus(), 350);
-    return () => clearTimeout(focusTimer);
-  }, []);
-
-  // ── SUBMISSION HANDSHAKE ────────────────────────────────────────────────────
-  // 1. Validate email format locally
-  // 2. PATCH email into the MM_LEDGER via saveStep (inside updateState) so the
-  //    worker has it when it reads the ledger entry during finalize
-  // 3. Call onCalibrate() → handleCalibrate() in OnboardingContainer →
-  //    POST /api/ledger/:userId/finalize → Gotenberg → R2 → Brevo pipeline
   const handleSubmit = async () => {
-    const trimmed = emailInput.trim();
-    if (!trimmed || !isValidEmail(trimmed)) {
-      setEmailError(
-        isEs
-          ? 'Por favor, introduce una dirección de correo válida.'
-          : 'Please enter a valid email address.'
-      );
-      inputRef.current?.focus();
-      return;
-    }
-    setEmailError(null);
-
-    // Patch email into ledger before finalize fires
-    await updateState({ email: trimmed });
-
-    // Trigger the finalization pipeline
+    // Trigger the finalization pipeline directly since identity is already captured
     onCalibrate();
   };
 
@@ -69,9 +35,7 @@ export default function Step6Calibrate({ state, updateState, onCalibrate, isCali
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isCalibrating, emailInput]);
-
-  const formValid = isValidEmail(emailInput.trim());
+  }, [isCalibrating]);
 
   return (
     <div
@@ -131,73 +95,17 @@ export default function Step6Calibrate({ state, updateState, onCalibrate, isCali
         </ul>
       </div>
 
-      {/* ── EMAIL CAPTURE ─────────────────────────────────────────────────────── */}
-      <div className="mb-6">
-        <label
-          htmlFor="lead-email"
-          className="font-sans font-semibold text-[12px] text-[#888888] uppercase tracking-[0.14em] mb-2 block"
-        >
-          {isEs ? 'Correo electrónico' : 'Email address'}
-        </label>
-
-        <div
-          className={`relative w-full rounded-[var(--border-radius-input)] border transition-all duration-200 ${
-            emailError
-              ? 'border-[#e05252] shadow-[0_0_0_3px_rgba(224,82,82,0.12)]'
-              : isFocused
-              ? 'border-[var(--gold-primary)] shadow-[0_0_0_3px_rgba(212,175,55,0.12)]'
-              : 'border-[var(--border-default)]'
-          }`}
-        >
-          <input
-            ref={inputRef}
-            id="lead-email"
-            type="email"
-            inputMode="email"
-            autoComplete="email"
-            placeholder={isEs ? 'tu@correo.com' : 'you@email.com'}
-            value={emailInput}
-            disabled={isCalibrating}
-            onChange={(e) => {
-              setEmailInput(e.target.value);
-              if (emailError) setEmailError(null);
-            }}
-            onFocus={() => setIsFocused(true)}
-            onBlur={() => setIsFocused(false)}
-            className="w-full bg-[var(--bg-card)] text-white rounded-[var(--border-radius-input)] px-4 py-4 outline-none font-sans text-[15px] placeholder:text-[#444] disabled:opacity-50 transition-colors"
-          />
-          {/* Checkmark appears when email is valid */}
-          {formValid && !isCalibrating && (
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--gold-primary)] text-[16px]">
-              ✓
-            </div>
-          )}
-        </div>
-
-        {emailError && (
-          <p className="text-[#e05252] font-sans text-[12px] mt-1.5">{emailError}</p>
-        )}
-
-        <p className="font-sans text-[11px] text-[#555] mt-2 leading-relaxed">
-          {isEs
-            ? 'Sin spam. Solo tu plan de transformación. Cancelar en cualquier momento.'
-            : 'No spam. Just your transformation plan. Unsubscribe anytime.'}
-        </p>
-      </div>
-
       {/* ── SUBMIT CTA ─────────────────────────────────────────────────────────── */}
       <button
         id="lead-capture-submit"
-        disabled={isCalibrating || !formValid}
+        disabled={isCalibrating}
         onClick={handleSubmit}
         className={`
           w-full py-4 rounded-[var(--border-radius-input)] font-bebas text-[20px]
           tracking-[0.1em] transition-all duration-200 flex items-center justify-center gap-3
           ${isCalibrating
             ? 'bg-[var(--gold-secondary)] text-[#121212] cursor-wait'
-            : formValid
-            ? 'bg-[var(--gold-primary)] text-[#121212] hover:bg-[var(--gold-secondary)] hover:scale-[1.01] shadow-[0_4px_16px_rgba(212,175,55,0.25)]'
-            : 'bg-[var(--bg-card)] text-[var(--text-dim)] border border-[var(--border-default)] pointer-events-none'
+            : 'bg-[var(--gold-primary)] text-[#121212] hover:bg-[var(--gold-secondary)] hover:scale-[1.01] shadow-[0_4px_16px_rgba(212,175,55,0.25)]'
           }
         `}
       >
@@ -212,7 +120,7 @@ export default function Step6Calibrate({ state, updateState, onCalibrate, isCali
           </span>
         ) : (
           <>
-            <span>{isEs ? 'Enviar mi plan' : 'Send my plan'}</span>
+            <span>{isEs ? 'Generar mi plan' : 'Generate my plan'}</span>
             <span className="text-[18px]">→</span>
           </>
         )}

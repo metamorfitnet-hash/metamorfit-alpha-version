@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import EmailGateModal from "@/components/EmailGateModal";
 import { Header } from "@/components/Header";
 import { DailyTargetsPanel } from "@/components/DailyTargetsPanel";
 import { useOnboardingSession } from "@/hooks/useOnboardingSession";
@@ -71,20 +70,106 @@ export default function MealPlanPage() {
   const [mealDescription, setMealDescription] = useState("");
   const [isEstimating, setIsEstimating] = useState(false);
   const [estimateError, setEstimateError] = useState<string | null>(null);
-  const [showModal, setShowModal] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
 
-  const openEmailModal = () => setShowModal(true);
-  const closeEmailModal = () => setShowModal(false);
-
-  // Gives a 1.5s "Finalizing..." sense of engine work before the modal opens
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     if (!hasItems || isGenerating) return;
     setIsGenerating(true);
-    setTimeout(() => {
+
+    try {
+      const rawData = ledger?.data || {};
+      const weightVal = rawData.weightValue ? Number(rawData.weightValue) : null;
+      const weight = weightVal 
+        ? (rawData.weightUnit === 'lbs' ? Math.round(weightVal * 0.453592) : Math.round(weightVal))
+        : undefined;
+      const heightVal = rawData.heightValue ? Number(rawData.heightValue) : null;
+      const height = heightVal
+        ? (rawData.heightUnit === 'ft' ? Math.round(heightVal * 2.54) : Math.round(heightVal))
+        : undefined;
+
+      const workerPayload = {
+        userId: typeof window !== 'undefined' ? localStorage.getItem('mm_uid') || undefined : undefined,
+        email: sessionPayload?.email || rawData.email,
+        fullName: sessionPayload?.name || rawData.name || "Athlete",
+        locale: isEs ? 'es' : 'en',
+        tags: ["meal-planner"],
+        identity: {
+          name: sessionPayload?.name || rawData.name || "Athlete",
+          bodyType: sessionPayload?.somatotype || rawData.somatotype || "Default",
+          goal: sessionPayload?.goal || rawData.goal || "Default",
+          age: rawData.age ? Number(rawData.age) : undefined,
+          weightKg: weight,
+          heightCm: height,
+          bodyFatPct: rawData.bodyFatPercent ? Number(rawData.bodyFatPercent) : undefined
+        },
+        metabolicProfile: {
+          bmr: Math.round(targets.bmr),
+          tdee: Math.round(targets.tdee),
+          targetKcal: Math.round(targets.calories),
+          proteinGrams: Math.round(targets.protein),
+          carbsGrams: Math.round(targets.carbs),
+          fatsGrams: Math.round(targets.fats),
+          activityLevel: rawData.activityLevel || "Moderate",
+          surplus: Math.round(targets.calories - targets.tdee),
+          water: targets.water,
+          steps: targets.steps,
+          fiber: targets.fiber
+        },
+        personalization: {
+          personalizationScore: sessionPayload?.personalizationScore || 95
+        },
+        intelligenceNotes: (sessionPayload?.insights || []).map((text: string) => ({
+          category: 'AI Insight',
+          layer: 1,
+          personalizationScore: 100,
+          whyThisMatters: text,
+          howToApplyToday: text
+        })),
+        meals: meals.map(m => ({
+          name: m.name,
+          calories: Math.round(m.ingredients.reduce((acc, i) => acc + i.calories, 0)),
+          protein: Math.round(m.ingredients.reduce((acc, i) => acc + i.protein, 0)),
+          carbs: Math.round(m.ingredients.reduce((acc, i) => acc + i.carbs, 0)),
+          fats: Math.round(m.ingredients.reduce((acc, i) => acc + i.fats, 0)),
+          ingredients: m.ingredients.map(i => ({
+            name: i.name,
+            calories: Math.round(i.calories),
+            protein: Math.round(i.protein),
+            carbs: Math.round(i.carbs),
+            fats: Math.round(i.fats)
+          }))
+        })),
+        delivered: {
+          kcal: Math.round(grandTotals.calories),
+          protein: Math.round(grandTotals.protein),
+          carb: Math.round(grandTotals.carbs),
+          fat: Math.round(grandTotals.fats)
+        },
+        explanation: sessionPayload?.explanation || sessionPayload?.insights?.join('\n\n')
+      };
+
+      const workerUrl = process.env.NEXT_PUBLIC_WORKER_URL || "https://metamorfit-worker-alpha.metamorfitnet.workers.dev";
+      const res = await fetch(`${workerUrl}/api/generate`, {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${process.env.NEXT_PUBLIC_MM_UI_SECRET || 'meta_alpha_sec_a7c2e9f1b3d8k9m_42891_abc'}`
+        },
+        body: JSON.stringify(workerPayload)
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || (isEs ? "Fallo al generar el PDF." : "Failed to generate PDF."));
+      }
+
+      router.push("/thank-you");
+    } catch (err) {
+      console.error("Generate error:", err);
+      alert(isEs ? "Ocurrió un error al generar tu plan. Por favor, inténtalo de nuevo." : "An error occurred while generating your plan. Please try again.");
       setIsGenerating(false);
-      openEmailModal();
-    }, 1500);
+    }
   };
 
   // ── Session hook — replaces manual sessionStorage reads ──────────────────
@@ -422,57 +507,6 @@ export default function MealPlanPage() {
         </div>
       )}
 
-      {showModal && (() => {
-        const rawData = ledger?.data || {};
-        const metrics = ledger?.results?.metrics || {};
-        const weightVal = rawData.weightValue ? Number(rawData.weightValue) : null;
-        const weight = weightVal 
-          ? (rawData.weightUnit === 'lbs' ? Math.round(weightVal * 0.453592) : Math.round(weightVal))
-          : null;
-        const heightVal = rawData.heightValue ? Number(rawData.heightValue) : null;
-        const height = heightVal
-          ? (rawData.heightUnit === 'ft' ? Math.round(heightVal * 2.54) : Math.round(heightVal))
-          : null;
-
-        const calculatorInput = {
-          age: rawData.age ? Number(rawData.age) : undefined,
-          weight: weight || metrics.weightKg || undefined,
-          height: height || metrics.heightCm || undefined,
-          bodyFatPercent: rawData.bodyFatPercent ? Number(rawData.bodyFatPercent) : undefined,
-          goal: sessionPayload?.goal || rawData.goal || undefined,
-          bodyType: sessionPayload?.somatotype || rawData.somatotype || undefined,
-        };
-
-        return (
-          <EmailGateModal 
-            onClose={closeEmailModal} 
-            calculatorInput={calculatorInput}
-            mealPlan={{
-            targets: {
-              calories: Math.round(targets.calories),
-              protein: Math.round(targets.protein),
-              carbs: Math.round(targets.carbs),
-              fats: Math.round(targets.fats),
-              fiber: Math.round(targets.fiber),
-              water: targets.water,
-              steps: targets.steps,
-              tdee: Math.round(targets.tdee),
-              bmr: Math.round(targets.bmr)
-            },
-            totals: {
-              calories: Math.round(grandTotals.calories),
-              protein: Math.round(grandTotals.protein),
-              carbs: Math.round(grandTotals.carbs),
-              fats: Math.round(grandTotals.fats)
-            },
-            meals: meals,
-            notes: sessionPayload?.insights?.map((text, i) => ({ category: 'AI Insight', text })) || [],
-            personalizationScore: sessionPayload?.personalizationScore || 95,
-            explanation: sessionPayload?.insights?.join('\n\n') || undefined
-          }}
-        />
-        );
-      })()}
     </div>
   );
 }

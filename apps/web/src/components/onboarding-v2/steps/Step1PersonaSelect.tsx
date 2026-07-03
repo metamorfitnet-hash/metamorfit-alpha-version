@@ -12,6 +12,9 @@ export default function Step1PersonaSelect({ state, updateState }: Props) {
   const { t } = useTranslation();
   const [error, setError] = useState<string | null>(null);
   const [animateIn, setAnimateIn] = useState(false);
+  const [emailError, setEmailError] = useState<string | null>(null);
+
+  const isValidEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
 
   const PERSONAS = [
     {
@@ -94,7 +97,9 @@ export default function Step1PersonaSelect({ state, updateState }: Props) {
     state.age !== null &&
     state.age >= 13 &&
     state.age <= 80 &&
-    state.persona !== null;
+    state.persona !== null &&
+    state.name !== null && state.name.trim() !== '' &&
+    state.email !== null && isValidEmail(state.email);
 
   useEffect(() => {
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
@@ -164,6 +169,55 @@ export default function Step1PersonaSelect({ state, updateState }: Props) {
       </div>
 
       {/* Divider between language selector and biometric form */}
+      <div className="w-full h-[1px] bg-[#1e1e1e] mb-7" />
+
+      {/* ── IDENTITY CAPTURE ─────────────────────────────────────────────────── */}
+      <div className="mb-8">
+        <h2 className="font-bebas text-[18px] md:text-xl mb-4 tracking-wide text-white uppercase">
+          {state.locale === 'es' ? 'Tu Identidad' : 'Your Identity'}
+        </h2>
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col">
+            <label htmlFor="name-input" className="font-sans font-semibold text-[13px] text-[#888888] uppercase tracking-[0.1em] mb-2">
+              {state.locale === 'es' ? 'Nombre / Cómo te llamamos' : 'First Name / What should we call you?'}
+            </label>
+            <input
+              id="name-input"
+              type="text"
+              placeholder={state.locale === 'es' ? 'Ej. Alex' : 'e.g. Alex'}
+              value={state.name || ''}
+              onChange={(e) => updateState({ name: e.target.value })}
+              className="w-full bg-[var(--bg-card)] border border-[var(--border-default)] focus:border-[var(--border-selected)] text-white rounded-[var(--border-radius-input)] px-4 py-3 outline-none font-sans transition-colors"
+            />
+          </div>
+          <div className="flex flex-col">
+            <label htmlFor="email-input" className="font-sans font-semibold text-[13px] text-[#888888] uppercase tracking-[0.1em] mb-2">
+              {state.locale === 'es' ? 'Correo Electrónico' : 'Email Address'}
+            </label>
+            <input
+              id="email-input"
+              type="email"
+              placeholder={state.locale === 'es' ? 'tu@correo.com' : 'you@email.com'}
+              value={state.email || ''}
+              onChange={(e) => {
+                const val = e.target.value;
+                updateState({ email: val });
+                if (val && !isValidEmail(val)) {
+                  setEmailError(state.locale === 'es' ? 'Por favor, introduce un correo electrónico válido.' : 'Please enter a valid email address.');
+                } else {
+                  setEmailError(null);
+                }
+              }}
+              className="w-full bg-[var(--bg-card)] border border-[var(--border-default)] focus:border-[var(--border-selected)] text-white rounded-[var(--border-radius-input)] px-4 py-3 outline-none font-sans transition-colors"
+            />
+            {emailError && (
+              <p className="text-[#e05252] font-sans text-[12px] mt-2">{emailError}</p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Divider between identity and biometric form */}
       <div className="w-full h-[1px] bg-[#1e1e1e] mb-7" />
 
       {/* ── BIOMETRIC INPUTS ─────────────────────────────────────────────────── */}
