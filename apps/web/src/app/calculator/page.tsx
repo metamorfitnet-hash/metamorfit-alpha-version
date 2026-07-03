@@ -89,7 +89,7 @@ function CalculatorContent() {
 }
 
 export default function CalculatorPage() {
-  const { finalized } = useOnboardingSession();
+  const { finalized, sessionPayload } = useOnboardingSession();
   const { i18n } = useTranslation();
   const isEs = i18n.language === 'es';
 
@@ -111,9 +111,12 @@ export default function CalculatorPage() {
                 : (isEs ? "Motor Metabólico de Precisión v2.0" : "Precision Metabolic Engine v2.0")}
             </span>
           </div>
-          <h1 className="relative z-10 mb-8">
-            {isEs ? "Resultados de" : "Macro Breakdown"} <span className="text-mm-gold">{isEs ? "Desglose de Macros." : "Results."}</span>
+          <h1 className="relative z-10 mb-2 text-4xl md:text-5xl font-heading uppercase tracking-wide">
+            {isEs ? "Bienvenido a tu plan," : "Welcome to your blueprint,"} <span className="text-mm-gold">{sessionPayload?.name || (isEs ? "Atleta" : "Athlete")}</span>
           </h1>
+          <p className="relative z-10 mb-8 text-lg text-mm-bone/60 font-body uppercase tracking-widest">
+            {isEs ? "Resultados de Desglose de Macros" : "Macro Breakdown Results"}
+          </p>
         </div>
 
         <Suspense fallback={<div className="text-mm-gold font-heading text-center py-32 text-2xl tracking-widest animate-pulse">{isEs ? "Inicializando Motor..." : "Initializing Engine..."}</div>}>

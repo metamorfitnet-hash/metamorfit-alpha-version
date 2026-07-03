@@ -13,4 +13,6 @@ export interface MacroPayload {
   steps?: number;
   explanation?: string | null;
   goal?: string;
+  name?: string;
+  email?: string;
 }

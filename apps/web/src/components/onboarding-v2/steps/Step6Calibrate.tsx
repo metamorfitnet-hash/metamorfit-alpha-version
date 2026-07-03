@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { OnboardingState } from '../types';
 
@@ -9,9 +9,17 @@ interface Props {
   isCalibrating: boolean;
 }
 
-export default function Step6Calibrate({ state, onCalibrate, isCalibrating }: Props) {
+const isValidEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
+
+export default function Step6Calibrate({ state, updateState, onCalibrate, isCalibrating }: Props) {
   const { t } = useTranslation();
   const [animateIn, setAnimateIn] = useState(false);
+  const [nameInput, setNameInput] = useState(state.name || '');
+  const [emailInput, setEmailInput] = useState(state.email || '');
+  const [nameError, setNameError] = useState<string | null>(null);
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [activeFocus, setActiveFocus] = useState<'name'|'email'|null>(null);
+  const nameRef = useRef<HTMLInputElement>(null);
 
   const isEs = state.locale === 'es';
 
@@ -20,8 +28,37 @@ export default function Step6Calibrate({ state, onCalibrate, isCalibrating }: Pr
     return () => clearTimeout(timer);
   }, []);
 
+  // Focus the first field (name) automatically
+  useEffect(() => {
+    const focusTimer = setTimeout(() => nameRef.current?.focus(), 350);
+    return () => clearTimeout(focusTimer);
+  }, []);
+
   const handleSubmit = async () => {
-    // Trigger the finalization pipeline directly since identity is already captured
+    const trimmedName = nameInput.trim();
+    const trimmedEmail = emailInput.trim();
+    let hasError = false;
+
+    if (!trimmedName) {
+      setNameError(isEs ? 'Por favor, introduce tu nombre.' : 'Please enter your first name.');
+      hasError = true;
+    } else {
+      setNameError(null);
+    }
+
+    if (!trimmedEmail || !isValidEmail(trimmedEmail)) {
+      setEmailError(isEs ? 'Por favor, introduce una dirección de correo válida.' : 'Please enter a valid email address.');
+      hasError = true;
+    } else {
+      setEmailError(null);
+    }
+
+    if (hasError) return;
+
+    // Patch identity into ledger before finalize fires
+    await updateState({ name: trimmedName, email: trimmedEmail });
+
+    // Trigger the macro calculation pipeline
     onCalibrate();
   };
 
@@ -35,7 +72,9 @@ export default function Step6Calibrate({ state, onCalibrate, isCalibrating }: Pr
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isCalibrating]);
+  }, [isCalibrating, nameInput, emailInput]);
+
+  const formValid = nameInput.trim() !== '' && isValidEmail(emailInput.trim());
 
   return (
     <div
@@ -56,56 +95,128 @@ export default function Step6Calibrate({ state, onCalibrate, isCalibrating }: Pr
 
         <h2 className="font-bebas text-[28px] md:text-[32px] tracking-wide text-white uppercase leading-tight mb-3">
           {isEs
-            ? 'Tu manual de transformación está listo.'
-            : 'Your transformation manual is ready.'}
+            ? 'Tu motor metabólico está listo.'
+            : 'Your metabolic engine is ready.'}
         </h2>
 
         <p className="font-sans text-[15px] text-[#888888] leading-relaxed max-w-[420px] mx-auto">
           {isEs
-            ? 'Tu plan personalizado de ganancia muscular, analizado por IA y calibrado específicamente para tu fisiología de hardgainer, se está compilando ahora mismo y será enviado directamente a tu bandeja de entrada.'
-            : 'Your personalized muscle-building plan — AI-analyzed and calibrated specifically for your hardgainer physiology — is being compiled right now and will be routed directly to your inbox.'}
+            ? 'Para personalizar tu plan de macros y guardar tu perfil, dinos cómo debemos llamarte y a dónde enviar las futuras actualizaciones de tu plan.'
+            : 'To personalize your macro blueprint and save your profile, let us know what to call you and where to send future plan updates.'}
         </p>
       </div>
 
-      {/* ── WHAT THEY RECEIVE ─────────────────────────────────────────────────── */}
-      <div className="bg-[var(--bg-card)] border border-[var(--border-default)] rounded-[var(--border-radius-card)] px-5 py-4 mb-8">
-        <p className="font-sans text-[11px] text-[var(--gold-primary)] uppercase tracking-[0.2em] mb-3">
-          {isEs ? 'Lo que recibirás' : "What you'll receive"}
-        </p>
-        <ul className="flex flex-col gap-2">
-          {(isEs
-            ? [
-                'Tu objetivo calórico preciso y división de macros',
-                'Estrategia de proteínas calibrada para tu metabolismo ectomorfo',
-                'Contexto de IA sobre por qué este plan funciona para ti',
-                'Documento PDF completo y premium entregado en minutos',
-              ]
-            : [
-                'Your precise caloric target and macro split',
-                'Protein strategy calibrated for your ectomorph metabolism',
-                'AI context on exactly why this plan works for your body',
-                'Full premium PDF document delivered within minutes',
-              ]
-          ).map((item, i) => (
-            <li key={i} className="flex items-start gap-2.5 font-sans text-[13px] text-[#cccccc]">
-              <span className="text-[var(--gold-primary)] mt-[1px] shrink-0">✓</span>
-              {item}
-            </li>
-          ))}
-        </ul>
+      {/* ── IDENTITY CAPTURE ─────────────────────────────────────────────────────── */}
+      <div className="mb-6 flex flex-col gap-4">
+        {/* First Name Input */}
+        <div>
+          <label
+            htmlFor="lead-name"
+            className="font-sans font-semibold text-[12px] text-[#888888] uppercase tracking-[0.14em] mb-2 block"
+          >
+            {isEs ? 'Nombre' : 'First Name'}
+          </label>
+
+          <div
+            className={`relative w-full rounded-[var(--border-radius-input)] border transition-all duration-200 ${
+              nameError
+                ? 'border-[#e05252] shadow-[0_0_0_3px_rgba(224,82,82,0.12)]'
+                : activeFocus === 'name'
+                ? 'border-[var(--gold-primary)] shadow-[0_0_0_3px_rgba(212,175,55,0.12)]'
+                : 'border-[var(--border-default)]'
+            }`}
+          >
+            <input
+              ref={nameRef}
+              id="lead-name"
+              type="text"
+              autoComplete="given-name"
+              placeholder={isEs ? 'Ej. Alex' : 'e.g. Alex'}
+              value={nameInput}
+              disabled={isCalibrating}
+              onChange={(e) => {
+                setNameInput(e.target.value);
+                if (nameError) setNameError(null);
+              }}
+              onFocus={() => setActiveFocus('name')}
+              onBlur={() => setActiveFocus(null)}
+              className="w-full bg-[var(--bg-card)] text-white rounded-[var(--border-radius-input)] px-4 py-4 outline-none font-sans text-[15px] placeholder:text-[#444] disabled:opacity-50 transition-colors"
+            />
+            {nameInput.trim() !== '' && !isCalibrating && (
+              <div className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--gold-primary)] text-[16px]">
+                ✓
+              </div>
+            )}
+          </div>
+          {nameError && (
+            <p className="text-[#e05252] font-sans text-[12px] mt-1.5">{nameError}</p>
+          )}
+        </div>
+
+        {/* Email Input */}
+        <div>
+          <label
+            htmlFor="lead-email"
+            className="font-sans font-semibold text-[12px] text-[#888888] uppercase tracking-[0.14em] mb-2 block"
+          >
+            {isEs ? 'Correo electrónico' : 'Email address'}
+          </label>
+
+          <div
+            className={`relative w-full rounded-[var(--border-radius-input)] border transition-all duration-200 ${
+              emailError
+                ? 'border-[#e05252] shadow-[0_0_0_3px_rgba(224,82,82,0.12)]'
+                : activeFocus === 'email'
+                ? 'border-[var(--gold-primary)] shadow-[0_0_0_3px_rgba(212,175,55,0.12)]'
+                : 'border-[var(--border-default)]'
+            }`}
+          >
+            <input
+              id="lead-email"
+              type="email"
+              inputMode="email"
+              autoComplete="email"
+              placeholder={isEs ? 'tu@correo.com' : 'you@email.com'}
+              value={emailInput}
+              disabled={isCalibrating}
+              onChange={(e) => {
+                setEmailInput(e.target.value);
+                if (emailError) setEmailError(null);
+              }}
+              onFocus={() => setActiveFocus('email')}
+              onBlur={() => setActiveFocus(null)}
+              className="w-full bg-[var(--bg-card)] text-white rounded-[var(--border-radius-input)] px-4 py-4 outline-none font-sans text-[15px] placeholder:text-[#444] disabled:opacity-50 transition-colors"
+            />
+            {isValidEmail(emailInput.trim()) && !isCalibrating && (
+              <div className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--gold-primary)] text-[16px]">
+                ✓
+              </div>
+            )}
+          </div>
+          {emailError && (
+            <p className="text-[#e05252] font-sans text-[12px] mt-1.5">{emailError}</p>
+          )}
+          <p className="font-sans text-[11px] text-[#555] mt-2 leading-relaxed">
+            {isEs
+              ? 'Sin spam. Solo tu plan de transformación. Cancelar en cualquier momento.'
+              : 'No spam. Just your transformation plan. Unsubscribe anytime.'}
+          </p>
+        </div>
       </div>
 
       {/* ── SUBMIT CTA ─────────────────────────────────────────────────────────── */}
       <button
         id="lead-capture-submit"
-        disabled={isCalibrating}
+        disabled={isCalibrating || !formValid}
         onClick={handleSubmit}
         className={`
           w-full py-4 rounded-[var(--border-radius-input)] font-bebas text-[20px]
           tracking-[0.1em] transition-all duration-200 flex items-center justify-center gap-3
           ${isCalibrating
             ? 'bg-[var(--gold-secondary)] text-[#121212] cursor-wait'
-            : 'bg-[var(--gold-primary)] text-[#121212] hover:bg-[var(--gold-secondary)] hover:scale-[1.01] shadow-[0_4px_16px_rgba(212,175,55,0.25)]'
+            : formValid
+            ? 'bg-[var(--gold-primary)] text-[#121212] hover:bg-[var(--gold-secondary)] hover:scale-[1.01] shadow-[0_4px_16px_rgba(212,175,55,0.25)]'
+            : 'bg-[var(--bg-card)] text-[var(--text-dim)] border border-[var(--border-default)] pointer-events-none'
           }
         `}
       >
@@ -115,12 +226,12 @@ export default function Step6Calibrate({ state, onCalibrate, isCalibrating }: Pr
             <span className="inline-block w-2 h-2 rounded-full bg-[#121212] animate-bounce [animation-delay:150ms]" />
             <span className="inline-block w-2 h-2 rounded-full bg-[#121212] animate-bounce [animation-delay:300ms]" />
             <span className="ml-1">
-              {isEs ? 'Compilando tu plan...' : 'Compiling your plan...'}
+              {isEs ? 'Calculando Macros...' : 'Calculating Macros...'}
             </span>
           </span>
         ) : (
           <>
-            <span>{isEs ? 'Generar mi plan' : 'Generate my plan'}</span>
+            <span>{isEs ? 'Calcular Macros' : 'Calculate Macros'}</span>
             <span className="text-[18px]">→</span>
           </>
         )}
