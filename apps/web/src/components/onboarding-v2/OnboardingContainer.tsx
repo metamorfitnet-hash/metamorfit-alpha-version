@@ -111,7 +111,7 @@ export default function OnboardingContainer() {
     }
   };
 
-  const handleCalibrate = async () => {
+  const handleCalibrate = async (identity: { name: string; email: string }) => {
     // Guard: ensure the shadow calculator in AhaPreview has all 4 required biometric inputs.
     // If any are missing, the animation would fall back to 2850.
     const missingInputs = !state.weightValue || !state.heightValue || !state.age || !state.sex;
@@ -202,16 +202,18 @@ export default function OnboardingContainer() {
         sessionStorage.setItem('mm_session_payload', JSON.stringify(finalData));
       }
 
-      // 2. If finalize() succeeded via ledger, patch in identity fields from local state
-      //    (the ledger API may not return name/email in its MacroPayload response)
-      if (finalData && (state.name || state.email)) {
-        finalData = {
+      // 2. Patch identity fields — use the explicitly passed values (not stale state closure)
+      //    This guarantees name/email are always written regardless of which finalize path ran.
+      if (identity?.name || identity?.email) {
+        const enriched = {
           ...finalData,
-          name: finalData.name || state.name || undefined,
-          email: finalData.email || state.email || undefined,
+          name: finalData?.name || identity.name || undefined,
+          email: finalData?.email || identity.email || undefined,
         };
-        // Re-persist the enriched payload to sessionStorage
-        sessionStorage.setItem('mm_session_payload', JSON.stringify(finalData));
+        sessionStorage.setItem('mm_session_payload', JSON.stringify(enriched));
+        // Also cache name in localStorage for cross-session fallback
+        if (identity.name) localStorage.setItem('mm_user_name', identity.name);
+        finalData = enriched;
       }
 
       // 3. Trigger Success Animation & Redirect
@@ -281,7 +283,7 @@ export default function OnboardingContainer() {
               )}
 
               {state.currentStep === 6 && (
-                <Step6Calibrate 
+              <Step6Calibrate 
                   state={state} 
                   updateState={updateState} 
                   onCalibrate={handleCalibrate} 

@@ -169,5 +169,8 @@ function mapLedgerEntryToMacroPayload(entry: any): MacroPayload {
     water: 3.7,
     steps: 10000,
     goal: data.goal || 'maintenance',
+    // ── Identity fields saved at Step 6 ──
+    name: data.name || undefined,
+    email: data.email || undefined,
   };
 }

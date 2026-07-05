@@ -5,7 +5,7 @@ import { OnboardingState } from '../types';
 interface Props {
   state: OnboardingState;
   updateState: (updates: Partial<OnboardingState>) => void;
-  onCalibrate: () => void;
+  onCalibrate: (identity: { name: string; email: string }) => void;
   isCalibrating: boolean;
 }
 
@@ -58,8 +58,8 @@ export default function Step6Calibrate({ state, updateState, onCalibrate, isCali
     // Patch identity into ledger before finalize fires
     await updateState({ name: trimmedName, email: trimmedEmail });
 
-    // Trigger the macro calculation pipeline
-    onCalibrate();
+    // Pass identity explicitly to avoid stale React state closure in OnboardingContainer
+    onCalibrate({ name: trimmedName, email: trimmedEmail });
   };
 
   // Allow Enter key to submit
