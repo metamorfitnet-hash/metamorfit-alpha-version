@@ -192,6 +192,9 @@ export default function OnboardingContainer() {
           explanation: data.explanation || null,
           somatotype: state.somatotype?.toLowerCase() || 'mesomorph',
           goal: state.goal?.toLowerCase() || 'maintenance',
+          // ── Identity fields captured at Step 6 ──
+          name: state.name || undefined,
+          email: state.email || undefined,
         };
 
         // Manually save to sessionStorage so /calculator works!
@@ -199,7 +202,19 @@ export default function OnboardingContainer() {
         sessionStorage.setItem('mm_session_payload', JSON.stringify(finalData));
       }
 
-      // 2. Trigger Success Animation & Redirect
+      // 2. If finalize() succeeded via ledger, patch in identity fields from local state
+      //    (the ledger API may not return name/email in its MacroPayload response)
+      if (finalData && (state.name || state.email)) {
+        finalData = {
+          ...finalData,
+          name: finalData.name || state.name || undefined,
+          email: finalData.email || state.email || undefined,
+        };
+        // Re-persist the enriched payload to sessionStorage
+        sessionStorage.setItem('mm_session_payload', JSON.stringify(finalData));
+      }
+
+      // 3. Trigger Success Animation & Redirect
       setTimeout(() => {
         setIsSuccessFlash(true);
       }, 600);

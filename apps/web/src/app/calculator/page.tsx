@@ -112,7 +112,7 @@ export default function CalculatorPage() {
             </span>
           </div>
           <h1 className="relative z-10 mb-2 text-4xl md:text-5xl font-heading uppercase tracking-wide">
-            {isEs ? "Bienvenido a tu plan," : "Welcome to your blueprint,"} <span className="text-mm-gold">{sessionPayload?.name || (isEs ? "Atleta" : "Athlete")}</span>
+            {isEs ? "Bienvenido a tu plan," : "Welcome to your blueprint,"} <span className="text-mm-gold">{(sessionPayload?.name || (isEs ? "Atleta" : "Athlete")).toUpperCase()}</span>
           </h1>
           <p className="relative z-10 mb-8 text-lg text-mm-bone/60 font-body uppercase tracking-widest">
             {isEs ? "Resultados de Desglose de Macros" : "Macro Breakdown Results"}
