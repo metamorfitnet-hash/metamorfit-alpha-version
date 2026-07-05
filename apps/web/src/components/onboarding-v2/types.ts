@@ -1,6 +1,6 @@
 export interface OnboardingState {
   locale: 'en' | 'es';
-  currentStep: 1 | 2 | 3 | 4 | 5 | 6;
+  currentStep: 1 | 2 | 3 | 4 | 5 | 6 | 7;
   sex: 'male' | 'female' | null;
   age: number | null;
   persona: 'hardgainer' | 'rebuilder' | 'optimizer' | 'converter' | null;

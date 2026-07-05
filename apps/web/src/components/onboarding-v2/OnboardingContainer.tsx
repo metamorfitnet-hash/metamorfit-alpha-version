@@ -9,6 +9,7 @@ import OnboardingProgressBar from './OnboardingProgressBar';
 import Step1PersonaSelect from './steps/Step1PersonaSelect';
 import Step2GoalSelect from './steps/Step2GoalSelect';
 import Step3Metrics from './steps/Step3Metrics';
+import Step4BodyFat from './steps/Step4BodyFat';
 import Step4Somatotype from './steps/Step4Somatotype';
 import Step5Activity from './steps/Step5Activity';
 import Step6Calibrate from './steps/Step6Calibrate';
@@ -259,7 +260,7 @@ export default function OnboardingContainer() {
         {lifecycle === 'FORM' && (
           <>
             <OnboardingHeader />
-            <OnboardingProgressBar currentStep={state.currentStep} totalSteps={6} isCalibrating={isCalibrating} />
+            <OnboardingProgressBar currentStep={state.currentStep} totalSteps={7} isCalibrating={isCalibrating} />
             
             <div className="mt-8 flex-1 relative w-full">
               {state.currentStep === 1 && (
@@ -275,14 +276,18 @@ export default function OnboardingContainer() {
               )}
 
               {state.currentStep === 4 && (
-                <Step4Somatotype state={state} updateState={updateState} />
+                <Step4BodyFat state={state} updateState={updateState} />
               )}
 
               {state.currentStep === 5 && (
-                <Step5Activity state={state} updateState={updateState} />
+                <Step4Somatotype state={state} updateState={updateState} />
               )}
 
               {state.currentStep === 6 && (
+                <Step5Activity state={state} updateState={updateState} />
+              )}
+
+              {state.currentStep === 7 && (
               <Step6Calibrate 
                   state={state} 
                   updateState={updateState} 

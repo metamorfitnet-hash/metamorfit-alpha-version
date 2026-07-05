@@ -172,5 +172,7 @@ function mapLedgerEntryToMacroPayload(entry: any): MacroPayload {
     // ── Identity fields saved at Step 6 ──
     name: data.name || undefined,
     email: data.email || undefined,
+    age: data.age ? Number(data.age) : undefined,
+    bodyFatPct: data.bodyFatPercent ? Number(data.bodyFatPercent) : undefined,
   };
 }

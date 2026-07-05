@@ -274,26 +274,9 @@ export async function handleLedger(request: Request, env: any, ctx: any, corsHea
 
       await env.MM_LEDGER.put(id, JSON.stringify(entry), { expirationTtl: 259200 });
 
-      // Handshake to Worker B (PDF Orchestrator)
-      ctx.waitUntil(
-        env.PDF_ORCHESTRATOR.fetch("https://metamorfit-pdf-workflow-alpha.metamorfitnet.workers.dev/", {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${env.MM_WORKER_SECRET}`,
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ userId: id, locale: entry.locale || entry.data?.locale || 'en', results: entry })
-        }).then(async (res) => {
-          if (!res.ok) {
-            const body = await res.text();
-            console.error(`[PDF Orchestrator] Handshake failed: ${res.status} — ${body}`);
-          } else {
-            console.log(`[PDF Orchestrator] Handshake success for userId=${id}`);
-          }
-        }).catch((err) => {
-          console.error(`[PDF Orchestrator] Network error: ${err.message}`);
-        })
-      );
+      // Handshake to Worker B (PDF Orchestrator) removed.
+      // The email and PDF generation is now handled entirely via the /api/generate route 
+      // on the frontend after the user creates their meal plan.
 
       return new Response(JSON.stringify(entry), { status: 200, headers: corsHeaders });
     }

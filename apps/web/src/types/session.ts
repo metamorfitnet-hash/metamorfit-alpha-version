@@ -15,4 +15,6 @@ export interface MacroPayload {
   goal?: string;
   name?: string;
   email?: string;
+  age?: number;
+  bodyFatPct?: number;
 }
