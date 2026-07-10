@@ -102,77 +102,87 @@ export async function handleGenerate(request: Request, env: any, ctx: any, corsH
 			currentErrorCode = 'AI_GEN_FAIL';
 			Sentry.addBreadcrumb({ category: 'pipeline', message: 'Starting AI explanation generation', level: 'info' });
 			
-			// Explicitly fetch macro results from KV Ledger per spec
-			const ledgerRaw = await env.MM_LEDGER.get(jobId);
-			const ledgerState = ledgerRaw ? JSON.parse(ledgerRaw) : {};
-			const macrosFromLedger = ledgerState.results?.metrics?.macros || payload.metabolicProfile;
+			// SINGLE SOURCE OF TRUTH: Use the client-compiled payload as the primary data source.
+			// The ledger is only consulted as a last-resort fallback for fields the client
+			// explicitly did not include (e.g. if identity block is entirely absent).
+			// We do NOT overwrite any field that the client already populated.
+			const macrosForAi = payload.metabolicProfile;
 
-			// Resilient backend fallback: hydrate payload.identity using ledgerState
+			// Only hydrate identity gaps from ledger — never overwrite client-provided values
 			payload.identity = payload.identity || {};
-			if (ledgerState.data) {
-				const data = ledgerState.data;
-				const metrics = ledgerState.results?.metrics || {};
+			const hasAllIdentityFields = payload.identity.name && payload.identity.age && payload.identity.weightKg;
+			if (!hasAllIdentityFields) {
+				// Attempt ledger lookup only as a gap-fill
+				try {
+					const ledgerRaw = await env.MM_LEDGER.get(jobId);
+					const ledgerState = ledgerRaw ? JSON.parse(ledgerRaw) : {};
+					if (ledgerState.data) {
+						const data = ledgerState.data;
+						const metrics = ledgerState.results?.metrics || {};
 
-				payload.identity.name = payload.identity.name || payload.fullName || data.persona || "MetaMorfit";
-				payload.identity.age = payload.identity.age || Number(data.age) || undefined;
-				
-				// Weight conversion / resolution
-				let weightKg = payload.identity.weightKg || Number(metrics.weightKg);
-				if (!weightKg && data.weightValue) {
-					weightKg = data.weightUnit === 'lbs' 
-						? Number(data.weightValue) * 0.453592 
-						: Number(data.weightValue);
+						// Only fill in if client didn't provide the value (never overwrite)
+						if (!payload.identity.name) {
+							payload.identity.name = payload.fullName || data.persona || 'MetaMorfit';
+						}
+						if (!payload.identity.age && data.age) {
+							payload.identity.age = Number(data.age);
+						}
+						if (!payload.identity.weightKg) {
+							let weightKg = Number(metrics.weightKg);
+							if (!weightKg && data.weightValue) {
+								weightKg = data.weightUnit === 'lbs'
+									? Number(data.weightValue) * 0.453592
+									: Number(data.weightValue);
+							}
+							if (weightKg) payload.identity.weightKg = Math.round(weightKg);
+						}
+						if (!payload.identity.heightCm) {
+							let heightCm = Number(metrics.heightCm);
+							if (!heightCm && data.heightValue) {
+								heightCm = data.heightUnit === 'ft'
+									? Number(data.heightValue) * 2.54
+									: Number(data.heightValue);
+							}
+							if (heightCm) payload.identity.heightCm = Math.round(heightCm);
+						}
+						if (!payload.identity.bodyFatPct && data.bodyFatPercent) {
+							payload.identity.bodyFatPct = Number(data.bodyFatPercent);
+						}
+						if (!payload.identity.goal && data.goal) {
+							payload.identity.goal = data.goal;
+						}
+						if (!payload.identity.bodyType) {
+							payload.identity.bodyType = data.somatotype || data.persona || 'Mesomorph';
+						}
+					}
+				} catch (ledgerErr) {
+					// Ledger unavailable — proceed with client payload only
+					console.warn(`[Job ${jobId}] Ledger gap-fill failed, using client payload only:`, ledgerErr);
 				}
-				payload.identity.weightKg = weightKg ? Math.round(weightKg) : undefined;
-
-				// Height conversion / resolution
-				let heightCm = payload.identity.heightCm || Number(metrics.heightCm);
-				if (!heightCm && data.heightValue) {
-					heightCm = data.heightUnit === 'ft' 
-						? Number(data.heightValue) * 2.54 
-						: Number(data.heightValue);
-				}
-				payload.identity.heightCm = heightCm ? Math.round(heightCm) : undefined;
-
-				payload.identity.bodyFatPct = payload.identity.bodyFatPct || Number(data.bodyFatPercent) || undefined;
-				
-				// Goal resolution - translate default/empty to a professional goal
-				let goal = payload.identity.goal || data.goal;
-				if (!goal || goal.toUpperCase() === 'DEFAULT') {
-					goal = 'Metabolic Optimization';
-				} else if (goal.toLowerCase() === 'cut') {
-					goal = 'Fat Loss';
-				} else if (goal.toLowerCase() === 'bulk') {
-					goal = 'Muscle Gain';
-				} else if (goal.toLowerCase() === 'maintain') {
-					goal = 'Maintenance';
-				} else if (goal.toLowerCase() === 'recomp') {
-					goal = 'Recomposition';
-				}
-				payload.identity.goal = goal;
-
-				// Somatotype resolution - translate default/empty to a professional body type
-				let bodyType = payload.identity.bodyType || data.somatotype || data.persona;
-				if (!bodyType || bodyType.toUpperCase() === 'DEFAULT') {
-					bodyType = 'Mesomorph';
-				}
-				payload.identity.bodyType = bodyType;
 			}
 
-			// Clean fallback values in case ledgerState didn't populate them
-			payload.identity.name = payload.identity.name || payload.fullName || "MetaMorfit";
+			// Final safety: ensure required string fields have clean values
+			payload.identity.name = payload.identity.name || payload.fullName || 'MetaMorfit';
 			if (!payload.identity.goal || payload.identity.goal.toUpperCase() === 'DEFAULT') {
 				payload.identity.goal = 'Metabolic Optimization';
+			} else if (payload.identity.goal.toLowerCase() === 'cut') {
+				payload.identity.goal = 'Fat Loss';
+			} else if (payload.identity.goal.toLowerCase() === 'bulk') {
+				payload.identity.goal = 'Muscle Gain';
+			} else if (payload.identity.goal.toLowerCase() === 'maintain') {
+				payload.identity.goal = 'Maintenance';
+			} else if (payload.identity.goal.toLowerCase() === 'recomp') {
+				payload.identity.goal = 'Recomposition';
 			}
 			if (!payload.identity.bodyType || payload.identity.bodyType.toUpperCase() === 'DEFAULT') {
 				payload.identity.bodyType = 'Mesomorph';
 			}
-			
+
 			const aiStart = Date.now();
 			const aiResult = await getAiExplanation(env, {
-				locale: payload.locale || ledgerState.data?.locale || 'en',
-				identity: payload.identity || {},
-				metabolicProfile: macrosFromLedger,
+				locale: payload.locale || 'en',
+				identity: payload.identity,
+				metabolicProfile: macrosForAi,
 				personalizationScore: payload.personalizationScore || 100
 			} as ExplanationInput);
 			payload.explanation = aiResult.explanation;
