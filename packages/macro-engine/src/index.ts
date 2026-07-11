@@ -122,7 +122,7 @@ import { handleDownload } from './routes/download';
 import { handleSync } from './routes/sync';
 import { handleStats } from './routes/stats';
 import { handleHealth } from './routes/health';
-import { handleSendPdf } from './routes/sendPdf';
+
 import { handleGallery } from './routes/gallery';
 
 // ─── 3. ORCHESTRATION ROUTES ──────────────────────────────────────────────────
@@ -131,9 +131,7 @@ app.post('/api/generate', async (c) => {
   return await handleGenerate(c.req.raw, c.env, c.executionCtx, {});
 });
 
-app.post('/api/send-pdf', async (c) => {
-  return await handleSendPdf(c.req.raw, c.env, c.executionCtx, {});
-});
+
 
 app.get('/api/status/:jobId', async (c) => {
   const url = new URL(c.req.url);

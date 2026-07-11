@@ -3,7 +3,7 @@ import { handleHealth } from "./routes/health";
 import { handleStats } from "./routes/stats";
 import { handleSync } from "./routes/sync";
 import { handleGallery } from "./routes/gallery";
-import { handleSendPdf } from "./routes/sendPdf";
+
 import { handleStatus } from "./routes/status";
 import { handleDownload } from "./routes/download";
 import { handleEstimate } from "./routes/estimate";
@@ -90,9 +90,7 @@ export default Sentry.withSentry(
 				else if (pathname === "/api/generate" || pathname === "/generate") {
 					response = await handleGenerate(request, env, ctx, corsHeaders);
 				}
-				else if (pathname === "/api/send-pdf" || pathname === "/pdf" || pathname === "/lead") {
-					response = await handleSendPdf(request, env, ctx, corsHeaders);
-				}
+
 				else if (pathname.startsWith("/api/status/")) response = await handleStatus(request, env, url, corsHeaders);
 				else if (pathname.startsWith("/api/download/")) response = await handleDownload(request, env, url, corsHeaders);
 
