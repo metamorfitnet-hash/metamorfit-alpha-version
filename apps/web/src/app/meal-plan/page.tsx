@@ -97,10 +97,10 @@ export default function MealPlanPage() {
           name: sessionPayload?.name || rawData.name || "Athlete",
           bodyType: sessionPayload?.somatotype || rawData.somatotype || "Default",
           goal: sessionPayload?.goal || rawData.goal || "Default",
-          age: sessionPayload?.age ?? (rawData.age ? Number(rawData.age) : undefined),
+          age: Number(sessionPayload?.age) || Number(rawData.age) || undefined,
           weightKg: weight,
           heightCm: height,
-          bodyFatPct: sessionPayload?.bodyFatPct ?? (rawData.bodyFatPercent ? Number(rawData.bodyFatPercent) : undefined)
+          bodyFatPct: Number(sessionPayload?.bodyFatPct) || Number(rawData.bodyFatPercent) || undefined
         },
         metabolicProfile: {
           bmr: Math.round(targets.bmr),
