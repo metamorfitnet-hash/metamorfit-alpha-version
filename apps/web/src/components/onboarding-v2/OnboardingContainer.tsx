@@ -296,23 +296,7 @@ export default function OnboardingContainer() {
                 />
               )}
 
-              {state.currentStep > 6 && (
-                <div className="p-6 rounded-[var(--border-radius-card)] bg-[var(--bg-card)]">
-                   <h2 className="font-bebas text-2xl mb-4 text-[var(--text-primary)]">Step {state.currentStep} Placeholder</h2>
-                   <p className="text-[var(--text-muted)]">This step will be implemented in the next phase.</p>
-                   
-                   <div className="mt-6 flex gap-4">
-                      {state.currentStep < 6 && (
-                          <button 
-                              onClick={() => updateState({ currentStep: (state.currentStep + 1) as OnboardingState['currentStep'] })}
-                              className="px-6 py-2 rounded font-bold uppercase tracking-wide hover:opacity-90 transition-opacity bg-[var(--gold-primary)] text-[#121212]"
-                          >
-                              Next Step (Dev)
-                          </button>
-                      )}
-                   </div>
-                </div>
-              )}
+
 
               {state.currentStep > 1 && (
                 <button 
