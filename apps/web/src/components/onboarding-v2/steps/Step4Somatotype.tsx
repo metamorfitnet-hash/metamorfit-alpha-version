@@ -121,7 +121,7 @@ export default function Step4Somatotype({ state, updateState }: Props) {
       {/* Explicit Continue button — the sole route forward */}
       <button
         disabled={!isFormValid}
-        onClick={() => updateState({ currentStep: 6 })}
+        onClick={() => updateState({ currentStep: 5 })}
         className={`
           w-full py-4 rounded-[var(--border-radius-input)] font-sans font-bold
           uppercase tracking-[0.15em] text-[15px] transition-all duration-200

@@ -114,6 +114,12 @@
       }
     }
   },
+  "step6bf": {
+    "title": "DO YOU KNOW YOUR BODY FAT %?",
+    "desc": "Optional: If you don't know it, you can leave it blank and continue.",
+    "bodyFatLabel": "BODY FAT %",
+    "continueBtn": "CONTINUE →"
+  },
   "step6": {
     "title": "PRECISION TUNING",
     "desc": "Optional data improves calibration.",

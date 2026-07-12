@@ -114,6 +114,12 @@
       }
     }
   },
+  "step6bf": {
+    "title": "¿CONOCES TU PORCENTAJE DE GRASA?",
+    "desc": "Opcional: Si no lo conoces, puedes dejarlo en blanco y continuar.",
+    "bodyFatLabel": "% DE GRASA CORPORAL",
+    "continueBtn": "CONTINUAR →"
+  },
   "step6": {
     "title": "AJUSTE DE PRECISIÓN",
     "desc": "Los datos opcionales mejoran la calibración.",

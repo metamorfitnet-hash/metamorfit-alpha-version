@@ -51,7 +51,7 @@ export default function Step5Activity({ state, updateState }: Props) {
   // Continue button: awaits backend sync then routes — single atomic call
   const handleContinue = async () => {
     if (!state.activityLevel) return;
-    await updateState({ activityLevel: state.activityLevel, currentStep: 7 });
+    await updateState({ activityLevel: state.activityLevel, currentStep: 6 });
   };
 
   const isFormValid = Boolean(state.activityLevel);

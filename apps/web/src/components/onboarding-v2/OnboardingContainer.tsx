@@ -276,15 +276,15 @@ export default function OnboardingContainer() {
               )}
 
               {state.currentStep === 4 && (
-                <Step4BodyFat state={state} updateState={updateState} />
-              )}
-
-              {state.currentStep === 5 && (
                 <Step4Somatotype state={state} updateState={updateState} />
               )}
 
-              {state.currentStep === 6 && (
+              {state.currentStep === 5 && (
                 <Step5Activity state={state} updateState={updateState} />
+              )}
+
+              {state.currentStep === 6 && (
+                <Step4BodyFat state={state} updateState={updateState} />
               )}
 
               {state.currentStep === 7 && (
