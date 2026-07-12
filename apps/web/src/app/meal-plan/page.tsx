@@ -330,14 +330,22 @@ export default function MealPlanPage() {
       <main className="flex-1 w-full pt-36 pb-28 px-6 md:px-12 max-w-[1600px] mx-auto flex flex-col gap-14">
 
         {/* ── PAGE HERO ── */}
-        <header className="animate-slideUp mb-4">
-          {sessionPayload?.name && (
-            <p className="text-mm-gold font-heading tracking-[0.3em] uppercase text-sm mb-3 opacity-80">
-              {isEs ? `Plan de ${sessionPayload.name.toUpperCase()}` : `${sessionPayload.name.toUpperCase()}'s Plan`}
-            </p>
-          )}
-          <h1 className="text-6xl md:text-7xl font-heading tracking-tight mb-5 uppercase">{isEs ? "Construye tu" : "Build Your"} <span className="text-mm-gold">{isEs ? "Plan de Comidas Diario." : "Daily Meal Plan."}</span></h1>
-          <p className="text-[17px] text-mm-bone/60 max-w-2xl font-body leading-loose">{isEs ? "Diseña un día completo de comidas dirigidas con precisión que se ajusten a tus objetivos macro." : "Design a full day of precision-targeted meals that matches your macro objectives."}</p>
+        <header className="animate-slideUp mb-6">
+          <h1 className="text-6xl md:text-7xl font-heading tracking-tight mb-5 uppercase">
+            {sessionPayload?.name ? (
+              <>
+                <span className="text-mm-gold">{sessionPayload.name}</span>
+                {isEs ? ", construye tu plan de comidas diario." : ", build your daily meal plan."}
+              </>
+            ) : (
+              <>
+                {isEs ? "Construye tu" : "Build Your"} <span className="text-mm-gold">{isEs ? "Plan de Comidas Diario." : "Daily Meal Plan."}</span>
+              </>
+            )}
+          </h1>
+          <p className="text-[17px] text-mm-bone/60 max-w-2xl font-body leading-loose">
+            {isEs ? "Diseña un día completo de comidas dirigidas con precisión que se ajusten a tus objetivos macro." : "Design a full day of precision-targeted meals that matches your macro objectives."}
+          </p>
         </header>
 
         {/* ── DAILY TARGETS DASHBOARD ── */}
